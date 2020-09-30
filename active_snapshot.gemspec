@@ -22,4 +22,5 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "activerecord"
   s.add_runtime_dependency "railties"
+  s.add_runtime_dependency "activerecord-import"
 end

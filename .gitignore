@@ -6,10 +6,12 @@
 /pkg/
 /spec/reports/
 gemfiles/*.lock
-/tmp/
 .DS_Store
 ~.*
 ~*
+
+/tmp/
+/test/**/tmp/
 
 test/dummy_app/**/*.sqlite3.db
 test/dummy_app/**/*.sqlite3

@@ -4,51 +4,122 @@
 <a href='https://travis-ci.com/westonganger/active_snapshot' target='_blank'><img height='21' style='border:0px;height:21px;' src='https://api.travis-ci.org/westonganger/active_snapshot.svg?branch=master' border='0' alt='Build Status' /></a>
 <a href='https://rubygems.org/gems/active_snapshot' target='_blank'><img height='21' style='border:0px;height:21px;' src='https://ruby-gem-downloads-badge.herokuapp.com/active_snapshot?label=rubygems&type=total&total_label=downloads&color=brightgreen' border='0' alt='RubyGems Downloads' /></a>
 
-Dead simple snapshot versioning for ActiveRecord models and associations. I created this as simpler and less invasive alternative to PaperTrail and PaperTrailAssociationTracking.
+Dead simple snapshot versioning for ActiveRecord models and associations. I created this as a transparent white-box alternative to the gems PaperTrail and PaperTrailAssociationTracking.
 
 Key Features:
 
 - Create and Restore snapshots of a parent record and any specified child records
-- Predictible and explicit behaviour provides much needed clarity to your restore logic as opposed to the black hole that is PaperTrailAssociationTracking
+- Snapshots are created upon request only, we do not use Activerecord callbacks
+- Predictible and explicit behaviour provides much needed clarity to your restore logic
 - Tiny method footprint so its easy to completely override the logic later
 
-## Installation
+Why This Library:
+
+- Model Versioning and Restoration require concious thought, design, and understanding.
+- You should understand the versioning and restoration process completely. Our small API and simple design supports this.
+- If your considering using [PaperTrail-AssociationTracking](https://github.com/westonganger/paper_trail-association_tracking) then you should re-consider because:
+  * It is mostly a blackbox solution that you likely do not fully understand
+  * It encourages you to set it up and then assume its "just working". This makes for major data problems later.
+
+Notice: I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
+
+# Installation
 
 ```ruby
-# Gemfile
-
 gem 'active_snapshot'
 ```
 
-Then generate and run the necessary migrations to setup the `active_snapshot_versions` table
+Then generate and run the necessary migrations to setup the `snapshots` and `snapshot_items` tables.
 
 ```
 rails generate active_snapshot:install
 rake db:migrate
 ```
 
-## Usage
+Now all models inheriting from ActiveRecord::Base have the following associations defined on them:
+
+```ruby
+has_many :snapshots, as: :item, class_name: 'Snapshot', dependent: :destroy
+has_many :snapshot_items, as: :item, class_name: 'SnapshotItem'
+```
+
+# Usage
+
+First, you must define the following instance methods on each model you want to snapshot. These are just examples to give you an idea.
+
+```ruby
+class Post < ActiveRecord::Base
+  has_many :comments
+  has_one :ip_address
+
+  def children_to_snapshot
+    association_names = [
+      "comments",
+      "ip_address",
+    ]
+
+    ### We load the current record and all associated records fresh from the database
+    instance = self.class.includes(*association_names).find(id)
+
+    child_items = []
+
+    association_names.each do |assoc_name|
+      child_items << instance.send(assoc_name)
+    end
+
+    ### Flatten and compact the child_items array
+    ### has_many associations return an ActiveRecord::Associations::CollectionProxy, so we call `to_a` on them
+    child_items = child_items.flat_map{|x| x.respond_to?(:to_a) ? x.to_a : x}
+
+    return child_items.compact
+  end
+
+  def snapshot_child_delete_item_function(child_record)
+    if ['TimeSlot', 'IpAddress'].include?(child_record.class.name)
+      ### In this example, we dont want to delete these because they are not independent child records to the parent model so we just "release" them
+      item.release!
+    else
+      item.destroy!
+    end
+  end
+
+end
+```
+
+Then you can use the following methods:
 
 ```ruby
 post = Post.first
 
-child_records = []
-post.comments.each do |comment|
-  child_records << comment
-end
-
 # Create snapshot grouped by identifier
-parent_snapshot_version = post.active_snapshot.create_snapshot!("snapshot_1", child_records: child_records, metadata: {foo: :bar})
+snapshot = post.create_snapshot!("snapshot_1", user: current_user, metadata: {foo: :bar}) ### user and metadata are optional
 
-# Restore snapshot and all its child snapshots
-post.active_snapshot.restore_snapshot!(parent_snapshot_version)
+# Restore snapshot and all its child snapshots, this will also delete the snapshots records once successfully completed
+snapshot.restore!
 
 # Destroy snapshot and all its child snapshots
-post.active_snapshot.destroy_snapshot!(parent_snapshot_version)
+snapshot.destroy!
 
-# Create individual snapshot version
-post.active_snapshot.create_version!(identifier: "snapshot_2", metadata: {foo: :bar})
+# Add additional records to snapshot, be sure you know what your doing before manually calling this
+snapshot.create_snapshot_item!(another_child_record)
 ```
+
+# Key Models Provided
+- [Snapshot](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot.rb)
+  * Contains a unique `identifier` column
+  * `has_many :item_snapshots`
+- [SnapshotItem](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot_item.rb)
+  * Contains `object` column with yaml encoded model instance `attributes`
+- [SnapshotsConcern](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshots_concern.rb) - 
+  * This concern is automatically applied to all ActiveRecord models
+  * Defines `snapshots` and `snapshot_items` has_many associations
+  * Defines `create_snapshot!` instance method
+
+# Additional Customizations
+
+A key aspect of this library is its simplicity and small API. For major functionality customizations we encourage you to first delete this gem and then copy this gems code directly into your repository.
+
+I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
 
 # Credits
 

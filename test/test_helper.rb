@@ -1,15 +1,8 @@
 #$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
-#require "active_snapshot"
+require "active_snapshot"
 
 require "minitest/autorun"
-
-require 'minitest/reporters'
-Minitest::Reporters.use!(
-  Minitest::Reporters::DefaultReporter.new,
-  ENV,
-  Minitest.backtrace_filter
-)
 
 ENV["RAILS_ENV"] = "test"
 
@@ -26,9 +19,16 @@ end
 
 require "rails/test_help"
 
-Rails.backtrace_cleaner.remove_silencers!
-
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 end
+
+Rails.backtrace_cleaner.remove_silencers!
+
+require 'minitest/reporters'
+Minitest::Reporters.use!(
+  Minitest::Reporters::DefaultReporter.new,
+  ENV,
+  Minitest.backtrace_filter
+)

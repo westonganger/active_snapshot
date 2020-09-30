@@ -1,14 +1,12 @@
-require "active_snapshot/version"
-
 require "active_record"
+require "activerecord-import"
 
-require "active_snapshot/version_model"
-require "active_snapshot/model_concern"
+require "active_snapshot/version"
+require "active_snapshot/errors"
+require "active_snapshot/snapshot"
+require "active_snapshot/snapshot_item"
+require "active_snapshot/snapshots_concern"
 
 module ActiveSnapshot
-  class Error < StandardError; end
-end
 
-ActiveSupport.on_load(:active_record) do
-  include ActiveSnapshot::ModelConcern
 end
