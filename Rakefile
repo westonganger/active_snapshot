@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/lib/active_snapshot/version.
 
 require "bundler/gem_tasks"
 require "rake/testtask"
+#require 'rails/dummy/tasks'
 
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"

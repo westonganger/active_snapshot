@@ -13,10 +13,6 @@ module ActiveSnapshot
     def restore!
       attrs = object
 
-      if attrs.key?("last_revision")
-        attrs["last_revision"] = revision_was
-      end
-
       if item
         item.update!(attrs)
       else

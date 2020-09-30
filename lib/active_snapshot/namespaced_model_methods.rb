@@ -6,15 +6,13 @@ module ActiveSnapshot
     end
 
     def create_snapshot!(identifier, child_records: [], metadata: {})
-      ActiveRecord::Base.transaction do
-        parent_version = @instance.create_version!({identifier: identifier, metadata: metadata})
+      parent_version = @instance.create_version!({identifier: identifier, metadata: metadata})
 
-        @instance.child_records.each do |item|
-          item.create_version!(identifier: identifier, parent_version_id: parent_version.id, metadata: metadata)
-        end
-
-        parent_version
+      @instance.child_records.each do |item|
+        item.create_version!(identifier: identifier, parent_version_id: parent_version.id, metadata: metadata)
       end
+
+      parent_version
     end
 
     def restore_snapshot!(parent_version) 
@@ -31,7 +29,7 @@ module ActiveSnapshot
     end
 
     def create_version!(identifier:, parent_version_id: nil, metadata: {})
-      @instance.snapshot_versions.create!({
+      @instance.snapshots.create!({
         object: @instance.attributes, 
         identifier: identifier,
         parent_version_id: parent_version_id,
