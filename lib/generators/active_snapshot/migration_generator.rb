@@ -6,18 +6,22 @@ module ActiveSnapshot
   class MigrationGenerator < ::Rails::Generators::Base
     include ::Rails::Generators::Migration
 
+    def initialize(migration_path: "db/migrate")
+      @migration_path = File.expand_path(migration_path)
+
+      super
+    end
+
     def self.next_migration_number(dirname)
       ::ActiveRecord::Generators::Base.next_migration_number(dirname)
     end
 
     protected
 
-    def add_migration(template_name, extra_options = {})
+    def add_migration(template_name, opts = {})
       @template_name = template_name
 
-      migration_dir = File.expand_path("db/migrate")
-
-      if self.class.migration_exists?(migration_dir, template_name)
+      if self.class.migration_exists?(@migration_path, template_name)
         Kernel.warn "Migration already exists: #{template_name}"
       else
         migration_template(
@@ -25,7 +29,7 @@ module ActiveSnapshot
           "db/migrate/#{template_name}.rb",
           { 
             migration_version: migration_version, 
-          }.merge(extra_options)
+          }.merge(opts)
         )
       end
     end

@@ -9,10 +9,14 @@ module ActiveSnapshot
 
     def create_migration_file
       add_migration(
-        "create_snapshots_tables",
-        { table_options: table_options }
+        MIGRATION_NAME,
+        { 
+          table_options: table_options,
+        }
       )
     end
+
+    MIGRATION_NAME = "create_snapshots_tables".freeze
 
   end
 end

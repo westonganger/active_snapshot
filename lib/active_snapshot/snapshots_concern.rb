@@ -2,17 +2,18 @@ module SnapshotsConcern
   extend ActiveSupport::Concern
 
   included do
-    has_many :snapshots, as: :item, class_name: 'Snapshot', dependent: :destroy
-    has_many :snapshot_items, as: :item, class_name: 'SnapshotItem' ### Do NOT add dependent: :destroy, this will break restore functionality
+    ### We do NOT mark these as dependent: :destroy, the developer must manually destroy the snapshots or individual snapshot items
+    has_many :snapshots, as: :item, class_name: 'Snapshot'
+    has_many :snapshot_items, as: :item, class_name: 'SnapshotItem' 
   end
 
   ### Abstract Method
   def children_to_snapshot
-    raise ActiveSnapshot::Errors::ChildrenToSnapshotNotImplemented.new(self.class)
+    raise Snapshot::ChildrenToSnapshotNotImplemented.new(self.class)
   end
 
   def child_delete_function
-    raise ActiveSnapshot::Errors::ChildDeleteFunctionNotImplemented.new(self.class)
+    raise Snapshot::ChildDeleteFunctionNotImplemented.new(self.class)
   end
 
   def create_snapshot!(identifier, user: nil, metadata: nil)

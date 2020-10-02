@@ -4,7 +4,9 @@
 <a href='https://travis-ci.com/westonganger/active_snapshot' target='_blank'><img height='21' style='border:0px;height:21px;' src='https://api.travis-ci.org/westonganger/active_snapshot.svg?branch=master' border='0' alt='Build Status' /></a>
 <a href='https://rubygems.org/gems/active_snapshot' target='_blank'><img height='21' style='border:0px;height:21px;' src='https://ruby-gem-downloads-badge.herokuapp.com/active_snapshot?label=rubygems&type=total&total_label=downloads&color=brightgreen' border='0' alt='RubyGems Downloads' /></a>
 
-Dead simple snapshot versioning for ActiveRecord models and associations. I created this as a transparent white-box alternative to the gems PaperTrail and PaperTrailAssociationTracking.
+Dead simple snapshot versioning for ActiveRecord models and associations. I created this as a transparent white-box alternative to the gems paper_trail and paper_trail-association_tracking.
+
+⚠️  **Warning: v0.x releases are subject to API changes**
 
 Key Features:
 
@@ -17,9 +19,9 @@ Why This Library:
 
 - Model Versioning and Restoration require concious thought, design, and understanding.
 - You should understand the versioning and restoration process completely. Our small API and simple design supports this.
-- If your considering using [PaperTrail-AssociationTracking](https://github.com/westonganger/paper_trail-association_tracking) then you should re-consider because:
-  * It is mostly a blackbox solution that you likely do not fully understand
-  * It encourages you to set it up and then assume its "just working". This makes for major data problems later.
+- If your considering using [paper_trail-association_tracking](https://github.com/westonganger/paper_trail-association_tracking) then you should re-consider because:
+  * PT-AT is mostly a blackbox solution that you likely do not fully understand
+  * PT-AT encourages you to set it up and then assume its "just working". This makes for major data problems later.
 
 Notice: I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
 
@@ -39,7 +41,7 @@ rake db:migrate
 Now all models inheriting from ActiveRecord::Base have the following associations defined on them:
 
 ```ruby
-has_many :snapshots, as: :item, class_name: 'Snapshot', dependent: :destroy
+has_many :snapshots, as: :item, class_name: 'Snapshot'
 has_many :snapshot_items, as: :item, class_name: 'SnapshotItem'
 ```
 
@@ -67,16 +69,21 @@ class Post < ActiveRecord::Base
       child_items << instance.send(assoc_name)
     end
 
-    ### Flatten and compact the child_items array
-    ### has_many associations return an ActiveRecord::Associations::CollectionProxy, so we call `to_a` on them
+    ### Flatten the child_items array
+    ### Note: has_many associations return an ActiveRecord::Associations::CollectionProxy
+    ### so we must call `to_a` on them
     child_items = child_items.flat_map{|x| x.respond_to?(:to_a) ? x.to_a : x}
 
-    return child_items.compact
+    ### Remove any empty items
+    child_items.compact
+
+    return child_items
   end
 
   def snapshot_child_delete_item_function(child_record)
     if ['TimeSlot', 'IpAddress'].include?(child_record.class.name)
-      ### In this example, we dont want to delete these because they are not independent child records to the parent model so we just "release" them
+      ### In this example, we dont want to delete these because they
+      ### are not independent child records to the parent model so we just "release" them
       item.release!
     else
       item.destroy!
@@ -91,16 +98,17 @@ Then you can use the following methods:
 ```ruby
 post = Post.first
 
-# Create snapshot grouped by identifier
-snapshot = post.create_snapshot!("snapshot_1", user: current_user, metadata: {foo: :bar}) ### user and metadata are optional
+# Create snapshot grouped by identifier, user and metadata are optional
+snapshot = post.create_snapshot!("snapshot_1", user: current_user, metadata: {foo: :bar})
 
-# Restore snapshot and all its child snapshots, this will also delete the snapshots records once successfully completed
+# Restore snapshot and all its child snapshots
 snapshot.restore!
 
 # Destroy snapshot and all its child snapshots
+# must be performed manually, snapshots and snapshot items are NEVER destroyed automatically
 snapshot.destroy!
 
-# Add additional records to snapshot, be sure you know what your doing before manually calling this
+# Add additional records to snapshot, know what your doing before manually calling this
 snapshot.create_snapshot_item!(another_child_record)
 ```
 
@@ -110,7 +118,8 @@ snapshot.create_snapshot_item!(another_child_record)
   * `has_many :item_snapshots`
 - [SnapshotItem](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot_item.rb)
   * Contains `object` column with yaml encoded model instance `attributes`
-- [SnapshotsConcern](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshots_concern.rb) - 
+  * `belongs_to :snapshot`
+- [SnapshotsConcern](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshots_concern.rb)
   * This concern is automatically applied to all ActiveRecord models
   * Defines `snapshots` and `snapshot_items` has_many associations
   * Defines `create_snapshot!` instance method
