@@ -4,16 +4,6 @@ module SnapshotsConcern
   included do
     ### We do NOT mark these as dependent: :destroy, the developer must manually destroy the snapshots or individual snapshot items
     has_many :snapshots, as: :item, class_name: 'Snapshot'
-    has_many :snapshot_items, as: :item, class_name: 'SnapshotItem' 
-  end
-
-  ### Abstract Method
-  def children_to_snapshot
-    raise Snapshot::ChildrenToSnapshotNotImplemented.new(self.class)
-  end
-
-  def child_delete_function
-    raise Snapshot::ChildDeleteFunctionNotImplemented.new(self.class)
   end
 
   def create_snapshot!(identifier, user: nil, metadata: nil)
@@ -37,8 +27,4 @@ module SnapshotsConcern
     snapshot
   end
 
-end
-
-ActiveSupport.on_load(:active_record) do
-  include SnapshotsConcern
 end

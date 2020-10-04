@@ -38,16 +38,90 @@ rails generate active_snapshot:install
 rake db:migrate
 ```
 
-Now all models inheriting from ActiveRecord::Base have the following associations defined on them:
+There will also be an initializer that applies the SnapshotsConcern to your models
+
+```ruby
+if defined?(ApplicationRecord)
+  ApplicationRecord.class_eval do
+    include SnapshotsConcern
+  end
+else
+  ### Load for all ActiveRecord models
+  ActiveSupport.on_load(:active_record) do
+    include SnapshotsConcern
+  end
+end
+```
+
+Now all models inheriting from ActiveRecord::Base have the `SnapshotsConcern` applied which defines the following associations on your models:
 
 ```ruby
 has_many :snapshots, as: :item, class_name: 'Snapshot'
-has_many :snapshot_items, as: :item, class_name: 'SnapshotItem'
 ```
+
+It only defines one additional instance method to your models: `create_snapshot!`
 
 # Usage
 
-First, you must define the following instance methods on each model you want to snapshot. These are just examples to give you an idea.
+You now have access to the following methods:
+
+```ruby
+post = Post.first
+
+# Create snapshot grouped by identifier, only :identifier argument is required, all others are optional
+snapshot = post.create_snapshot!(
+  identifier: "snapshot_1", # Required
+  user: current_user,
+  children: {
+    records:  :children_to_snapshot,
+    restore_allowed: :snapshot_restore_allowed?,
+    delete_item_function: :snapshot_child_delete_item_function,
+  },
+  metadata: {
+    foo: :bar
+  },
+)
+
+# Restore snapshot and all its child snapshots
+if snapshot.restore!
+  puts "Success"
+else
+  puts "Restore Not Allowed"
+
+# Destroy snapshot and all its child snapshots
+# must be performed manually, snapshots and snapshot items are NEVER destroyed automatically
+snapshot.destroy!
+```
+
+# Restoring Associated / Child Records
+
+In the following example the values within the `:children` argument refer to an instance method that is defined on your model (`post` in this case).
+
+```ruby
+snapshot = post.create_snapshot!(
+  identifier: "snapshot_1", # Required
+  children: {
+    records:  :children_to_snapshot,
+    restore_allowed: :snapshot_restore_allowed?,
+    delete_strategy: :snapshot_delete_strategy,
+  },
+)
+```
+
+You can also use procs instead if you dont want to define the instance methods.
+
+```ruby
+restore_allowed = ->(post) do
+  # Custom logic here, has access to the post that `create_snapshot` was called from
+end
+
+snapshot = post.create_snapshot!(
+  identifier: "snapshot_1", # Required
+  children: {
+    restore_allowed: restore_allowed,
+```
+
+Here are some method examples to give you an idea.
 
 ```ruby
 class Post < ActiveRecord::Base
@@ -60,7 +134,7 @@ class Post < ActiveRecord::Base
       "ip_address",
     ]
 
-    ### We load the current record and all associated records fresh from the database
+    ### In this example we just load the current record and all associated records fresh from the database
     instance = self.class.includes(*association_names).find(id)
 
     child_items = []
@@ -80,36 +154,36 @@ class Post < ActiveRecord::Base
     return child_items
   end
 
-  def snapshot_child_delete_item_function(child_record)
-    if ['TimeSlot', 'IpAddress'].include?(child_record.class.name)
-      ### In this example, we dont want to delete these because they
-      ### are not independent child records to the parent model so we just "release" them
-      item.release!
-    else
-      item.destroy!
+  def snapshot_restore_allowed?
+    # TODO
+  end
+
+  def snapshot_item_delete_strategy(snapshot_items)
+    children_to_keep = Set.new
+
+    snapshot_items.each do |snapshot_item|
+      key = "#{snapshot_item.item_type} #{snapshot_item.item_id}"
+      children_to_keep << key
+    end
+
+    ### Destroy or Detach Items not included in this Snapshot's Items
+    ### We do this first in case you decide to validate children in ItemSnapshot#restore_item! method
+    children_to_snapshot.each do |child_record|
+      key = "#{child_record.class.name} #{child_record.id}"
+
+      if !children_to_keep.include?(key)
+        if ['TimeSlot', 'IpAddress'].include?(child_record.class.name)
+          ### In this example, we dont want to delete these because they
+          ### are not independent child records to the parent model so we just "release" them
+          self.release!
+        else
+          item.destroy!
+        end
+      end
     end
   end
 
 end
-```
-
-Then you can use the following methods:
-
-```ruby
-post = Post.first
-
-# Create snapshot grouped by identifier, user and metadata are optional
-snapshot = post.create_snapshot!("snapshot_1", user: current_user, metadata: {foo: :bar})
-
-# Restore snapshot and all its child snapshots
-snapshot.restore!
-
-# Destroy snapshot and all its child snapshots
-# must be performed manually, snapshots and snapshot items are NEVER destroyed automatically
-snapshot.destroy!
-
-# Add additional records to snapshot, know what your doing before manually calling this
-snapshot.create_snapshot_item!(another_child_record)
 ```
 
 # Key Models Provided
