@@ -11,6 +11,7 @@ class <%= migration_name %> < ActiveRecord::Migration<%= migration_version %>
       t.belongs_to :user, polymorphic: true
       t.text :metadata, limit: TEXT_BYTES
       t.datetime :created_at, null: false
+      t.text :children_types
     end
 
     create_table :snapshot_items<%= table_options %> do |t|
@@ -18,6 +19,7 @@ class <%= migration_name %> < ActiveRecord::Migration<%= migration_version %>
       t.belongs_to :item, polymorphic: true, null: false, unique: [:snapshot_id], index: true
       t.text :object, limit: TEXT_BYTES, null: false
       t.datetime :created_at, null: false
+      t.string :child_type
     end
   end
 

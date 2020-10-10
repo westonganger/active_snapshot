@@ -24,13 +24,14 @@ class Snapshot < ActiveRecord::Base
     @metadata = hash
   end
 
-  def create_snapshot_item!(item)
-    snapshot_items.create!({
+  def build_snapshot_item(item, child_type: nil)
+    snapshot_items.new({
       object: self.attributes, 
       identifier: identifier,
       parent_version_id: id,
       item_id: item.id,
       item_type: item.class.name,
+      child_type: child_type,
     })
   end
 
@@ -47,11 +48,16 @@ class Snapshot < ActiveRecord::Base
       end
 
       ### Destroy or Detach Items not included in this Snapshot's Items
-      ### We do this first in case you decide to validate children in ItemSnapshot#restore_item! method
-      children_to_snapshot.each do |child_record|
-        key = "#{child_record.class.name} #{child_record.id}"
-        if !children_to_keep.include?(key)
-          item.snapshot_child_delete_function(child_record)
+      ### We do this first in case you later decide to validate children in ItemSnapshot#restore_item! method
+      @snapshot_children.each do |child_type, h|
+        delete_method = h[:delete_method] || ->(child_record){ child_record.destroy! }
+
+        h[:records].each do |child_record|
+          key = "#{child_record.class.name} #{child_record.id}"
+
+          if children_to_keep.exclude?(key)
+            delete_method.call(child_record)
+          end
         end
       end
 
@@ -59,9 +65,35 @@ class Snapshot < ActiveRecord::Base
       cached_snapshot_items.each do |snapshot|
         snapshot.restore_item!
       end
-
-      return true
     end
+
+    return true
+  end
+
+  class ChildrenDefinitionError < ArgumentError
+    def initialize(msg)
+      super("Invalid `has_snapshot_children` definition. #{msg}. For example: \n\n#{EXAMPLE}")
+    end
+
+    EXAMPLE = %Q(
+      has_snapshot_children do
+        ### Executed in the context of the instance / self
+
+        ### In this example we just load the current record and all associated records fresh from the database
+        instance = self.class.includes(:comments, :ip_address).find(id)
+        
+        {
+          comments: instance.comments,
+          tags: {
+            records: instance.tags
+          },
+          ip_address: {
+            record: instance.ip_address,
+            delete_method: ->(item){ item.release! }
+          }
+        }
+      end
+    ).strip.freeze
   end
 
 end

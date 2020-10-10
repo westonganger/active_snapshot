@@ -59,7 +59,9 @@ Now all models inheriting from ActiveRecord::Base have the `SnapshotsConcern` ap
 has_many :snapshots, as: :item, class_name: 'Snapshot'
 ```
 
-It only defines one additional instance method to your models: `create_snapshot!`
+It defines an optional extension to your model `has_snapshot_children`. See below.
+
+It defines one instance methods to your models: `create_snapshot!`
 
 # Usage
 
@@ -72,21 +74,13 @@ post = Post.first
 snapshot = post.create_snapshot!(
   identifier: "snapshot_1", # Required
   user: current_user,
-  children: {
-    records:  :children_to_snapshot,
-    restore_allowed: :snapshot_restore_allowed?,
-    delete_item_function: :snapshot_child_delete_item_function,
-  },
   metadata: {
     foo: :bar
   },
 )
 
 # Restore snapshot and all its child snapshots
-if snapshot.restore!
-  puts "Success"
-else
-  puts "Restore Not Allowed"
+snapshot.restore!
 
 # Destroy snapshot and all its child snapshots
 # must be performed manually, snapshots and snapshot items are NEVER destroyed automatically
@@ -98,93 +92,30 @@ snapshot.destroy!
 In the following example the values within the `:children` argument refer to an instance method that is defined on your model (`post` in this case).
 
 ```ruby
-snapshot = post.create_snapshot!(
-  identifier: "snapshot_1", # Required
-  children: {
-    records:  :children_to_snapshot,
-    restore_allowed: :snapshot_restore_allowed?,
-    delete_strategy: :snapshot_delete_strategy,
-  },
-)
-```
-
-You can also use procs instead if you dont want to define the instance methods.
-
-```ruby
-restore_allowed = ->(post) do
-  # Custom logic here, has access to the post that `create_snapshot` was called from
-end
-
-snapshot = post.create_snapshot!(
-  identifier: "snapshot_1", # Required
-  children: {
-    restore_allowed: restore_allowed,
-```
-
-Here are some method examples to give you an idea.
-
-```ruby
-class Post < ActiveRecord::Base
-  has_many :comments
-  has_one :ip_address
-
-  def children_to_snapshot
-    association_names = [
-      "comments",
-      "ip_address",
-    ]
+class Post
+  
+  has_snapshot_children do
+    ### Executed in the context of the instance / self
 
     ### In this example we just load the current record and all associated records fresh from the database
-    instance = self.class.includes(*association_names).find(id)
-
-    child_items = []
-
-    association_names.each do |assoc_name|
-      child_items << instance.send(assoc_name)
-    end
-
-    ### Flatten the child_items array
-    ### Note: has_many associations return an ActiveRecord::Associations::CollectionProxy
-    ### so we must call `to_a` on them
-    child_items = child_items.flat_map{|x| x.respond_to?(:to_a) ? x.to_a : x}
-
-    ### Remove any empty items
-    child_items.compact
-
-    return child_items
-  end
-
-  def snapshot_restore_allowed?
-    # TODO
-  end
-
-  def snapshot_item_delete_strategy(snapshot_items)
-    children_to_keep = Set.new
-
-    snapshot_items.each do |snapshot_item|
-      key = "#{snapshot_item.item_type} #{snapshot_item.item_id}"
-      children_to_keep << key
-    end
-
-    ### Destroy or Detach Items not included in this Snapshot's Items
-    ### We do this first in case you decide to validate children in ItemSnapshot#restore_item! method
-    children_to_snapshot.each do |child_record|
-      key = "#{child_record.class.name} #{child_record.id}"
-
-      if !children_to_keep.include?(key)
-        if ['TimeSlot', 'IpAddress'].include?(child_record.class.name)
-          ### In this example, we dont want to delete these because they
-          ### are not independent child records to the parent model so we just "release" them
-          self.release!
-        else
-          item.destroy!
-        end
-      end
-    end
+    instance = self.class.includes(:comments, :ip_address).find(id)
+    
+    {
+      comments: instance.comments,
+      tags: {
+        records: instance.tags
+      },
+      ip_address: {
+        record: instance.ip_address,
+        delete_method: ->(item){ item.release! }
+      }
+    }
   end
 
 end
 ```
+
+Now when you run `create_snapshot!` the associations will be tracked accordingly
 
 # Key Models Provided
 - [Snapshot](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot.rb)
@@ -194,9 +125,8 @@ end
   * Contains `object` column with yaml encoded model instance `attributes`
   * `belongs_to :snapshot`
 - [SnapshotsConcern](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshots_concern.rb)
-  * This concern is automatically applied to all ActiveRecord models
-  * Defines `snapshots` and `snapshot_items` has_many associations
-  * Defines `create_snapshot!` instance method
+  * Defines `snapshots` has_many associations
+  * Defines `create_snapshot!` and `has_snapshot_children` methods
 
 # Additional Customizations
 
