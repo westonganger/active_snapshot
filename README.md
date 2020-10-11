@@ -87,6 +87,16 @@ snapshot.restore!
 snapshot.destroy!
 ```
 
+# Reifying Snapshot Items
+
+You can view all of the reified snapshot items by calling the following method Its up to you on how to use this data. 
+
+Warning: If you call any save action on these items it will overwrite the actual record.
+
+```ruby
+reified_items = snapshot.fetch_reified_items
+```
+
 # Restoring Associated / Child Records
 
 In the following example the values within the `:children` argument refer to an instance method that is defined on your model (`post` in this case).

@@ -40,34 +40,42 @@ class Snapshot < ActiveRecord::Base
       ### Cache the child snapshots in a variable for re-use
       cached_snapshot_items = snapshot_items.includes(:item)
 
-      children_to_keep = Set.new
+      snapshot_children = item.has_snapshot_children
 
-      cached_snapshot_items.each do |snapshot_item|
-        key = "#{snapshot_item.item_type} #{snapshot_item.item_id}"
-        children_to_keep << key
-      end
+      if snapshot_children
+        children_to_keep = Set.new
 
-      ### Destroy or Detach Items not included in this Snapshot's Items
-      ### We do this first in case you later decide to validate children in ItemSnapshot#restore_item! method
-      @snapshot_children.each do |child_type, h|
-        delete_method = h[:delete_method] || ->(child_record){ child_record.destroy! }
+        cached_snapshot_items.each do |snapshot_item|
+          key = "#{snapshot_item.item_type} #{snapshot_item.item_id}"
+          children_to_keep << key
+        end
 
-        h[:records].each do |child_record|
-          key = "#{child_record.class.name} #{child_record.id}"
+        ### Destroy or Detach Items not included in this Snapshot's Items
+        ### We do this first in case you later decide to validate children in ItemSnapshot#restore_item! method
+        snapshot_children.each do |child_type, h|
+          delete_method = h[:delete_method] || ->(child_record){ child_record.destroy! }
 
-          if children_to_keep.exclude?(key)
-            delete_method.call(child_record)
+          h[:records].each do |child_record|
+            key = "#{child_record.class.name} #{child_record.id}"
+
+            if children_to_keep.exclude?(key)
+              delete_method.call(child_record)
+            end
           end
         end
       end
 
       ### Create or Update Items from Snapshot Items
-      cached_snapshot_items.each do |snapshot|
-        snapshot.restore_item!
+      cached_snapshot_items.each do |snapshot_item|
+        snapshot_item.restore_item!
       end
     end
 
     return true
+  end
+
+  def fetch_reified_items
+    snapshot_items.map{|x| x.item_type.constantize.new(x.object) }
   end
 
   class ChildrenDefinitionError < ArgumentError
