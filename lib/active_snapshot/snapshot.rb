@@ -40,7 +40,7 @@ class Snapshot < ActiveRecord::Base
       ### Cache the child snapshots in a variable for re-use
       cached_snapshot_items = snapshot_items.includes(:item)
 
-      snapshot_children = item.has_snapshot_children
+      snapshot_children = item.class.has_snapshot_children
 
       if snapshot_children
         children_to_keep = Set.new

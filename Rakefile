@@ -43,6 +43,8 @@ task default: [:db_prepare, :test]
 task :console do
   require 'active_snapshot'
 
+  require 'test/dummy_app/app/models/post'
+
   require 'irb'
   binding.irb
 end
