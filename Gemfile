@@ -6,7 +6,8 @@ gemspec
 gem "rake"
 gem "minitest"
 gem 'minitest-reporters'
-gem 'sqlite3'
+#gem 'sqlite3' # sqlite doesnt support jsonb
+gem 'pg'
 gem 'rails'
 #gem 'appraisal'
 gem 'warning'

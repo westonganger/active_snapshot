@@ -111,13 +111,13 @@ Now when you run `create_snapshot!` the associations will be tracked accordingly
 
 # Reifying Snapshot Items
 
-You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data. 
-
-Warning: If you call any save action on these items it will overwrite the actual record.
+You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data. As a safety these items have the `@readonly = true` attribute set on them. If you want to perform any write actions on the returned instances you will have to set `@readonly = nil`.
 
 ```ruby
 reified_items = snapshot.fetch_reified_items
 ```
+
+Note: 
 
 # Key Models Provided
 - [Snapshot](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot.rb)

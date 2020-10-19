@@ -10,21 +10,37 @@ Rake::TestTask.new(:test) do |t|
 end
 
 task :db_prepare do
-  FileUtils.rm(::Dir.glob("spec/dummy_app/db/*.sqlite3"))
+  Dir.chdir("test/dummy_app")
+
+  #FileUtils.rm(::Dir.glob("spec/dummy_app/db/*.sqlite3"))
+  
+  ### Create Database
+  ENV['DB'] ||= 'postgresql'
+
+  case ENV["DB"]
+  when "postgresql"
+    system("createdb active_snapshot_test")
+  when "mysql"
+    system("mysqladmin create active_snapshot_test")
+  else
+    raise "Don't know how to create specified DB: #{ENV['DB']}"
+  end
 
   ### Instantiates Rails
   require File.expand_path("test/dummy_app/config/environment.rb", __dir__)
 
-  migration_path = "test/dummy_app/db/migrate"
+  migration_path = "db/migrate"
 
   ### Generate Migration
   require "generators/active_snapshot/install/install_generator"
-  generator = ActiveSnapshot::InstallGenerator.new(migration_path: migration_path)
+  generator = ActiveSnapshot::InstallGenerator.new
 
   f = File.join(migration_path, generator.class::MIGRATION_NAME)
   if File.exist?(f)
     FileUtils.rm(f)
   end
+
+  #generator.instance_variable_set(:@migration_path, migration_path)
 
   generator.create_migration_file
 
@@ -36,6 +52,8 @@ task :db_prepare do
   else
     ActiveRecord::Migrator.migrate(migration_path)
   end
+
+  Dir.chdir(__dir__) ### Ensure switch back to current dir
 end
 
 task default: [:db_prepare, :test]

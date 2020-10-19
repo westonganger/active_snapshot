@@ -75,7 +75,7 @@ class Snapshot < ActiveRecord::Base
   end
 
   def fetch_reified_items
-    snapshot_items.map{|x| x.item_type.constantize.new(x.object) }
+    snapshot_items.map{|x| x.item_type.constantize.new(x.object); x.readonly!; x}
   end
 
   class ChildrenDefinitionError < ArgumentError

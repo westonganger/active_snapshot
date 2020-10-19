@@ -8,6 +8,13 @@ rvm:
   - 2.6
   - 2.7
   - ruby-head
+
+env:
+  global:
+    - TRAVIS=true
+  matrix:
+    - DB=postgresql
+    - DB=mysql
   
 jobs:
   allow_failures:
@@ -17,3 +24,7 @@ notifications:
   email:
     on_success: never
     on_failure: always
+
+services:
+  - postgresql
+  - mysql
