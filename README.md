@@ -6,8 +6,6 @@
 
 Simplified snapshots and restoration for ActiveRecord models and associations with a transparent white-box implementation.
 
-⚠️  **Warning: v0.x releases are subject to API changes**
-
 Key Features:
 
 - Create and Restore snapshots of a parent record and any specified child records
@@ -17,7 +15,11 @@ Key Features:
 
 Why This Library:
 
-Model Versioning and Restoration require concious thought, design, and understanding. You should understand your versioning and restoration process completely. Our small API and simple design supports this. If you are considering using [paper_trail-association_tracking](https://github.com/westonganger/paper_trail-association_tracking) then you should think again because PT-AT is mostly a blackbox solution which encourages you to set it up and then assume its "just working". This makes for major data problems later.
+Model Versioning and Restoration require concious thought, design, and understanding. You should understand your versioning and restoration process completely. This gem's small API and fully understandable design fully supports this. Install this gem and read its code completely OR copy the code straight into your codebase. Know it completely. Now you are free.
+
+
+If you are considering using [paper_trail-association_tracking](https://github.com/westonganger/paper_trail-association_tracking) then you should think again because PT-AT is mostly a blackbox solution which encourages you to set it up and then assume its "just working<sup>TM</sup>". This makes for major data problems later. Dont fall into this trap.
+
 
 
 # Installation
@@ -33,7 +35,7 @@ rails generate active_snapshot:install
 rake db:migrate
 ```
 
-It will also include the `SnapshotsConcern` to your ApplicationRecord or create an initializer if the ApplicationRecord model doesnt exist.
+It will also insert `include SnapshotsConcern` to your ApplicationRecord or create an initializer if the ApplicationRecord model doesnt exist.
 
 ```ruby
 # config/initializers/active_snapshot.rb
@@ -81,17 +83,16 @@ snapshot.destroy!
 
 # Restoring Associated / Child Records
 
-In the following example the values within the `:children` argument refer to an instance method that is defined on your model (`post` in this case).
-
 ```ruby
 class Post
   
   has_snapshot_children do
     ### Executed in the context of the instance / self
 
-    ### In this example we just load the current record and all associated records fresh from the database
+    ### In this example, we choose to do a fresh load from the database of the record and all associated records from the database
     instance = self.class.includes(:comments, :ip_address).find(id)
     
+    ### Define the associated records that will be restored
     {
       comments: instance.comments,
       tags: {
@@ -111,15 +112,24 @@ Now when you run `create_snapshot!` the associations will be tracked accordingly
 
 # Reifying Snapshot Items
 
-You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data. As a safety these items have the `@readonly = true` attribute set on them. If you want to perform any write actions on the returned instances you will have to set `@readonly = nil`.
+You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data. 
 
 ```ruby
 reified_items = snapshot.fetch_reified_items
 ```
 
-Note: 
+As a safety these records have the `@readonly = true` attribute set on them. If you want to perform any write actions on the returned instances you will have to set `@readonly = nil`.
 
-# Key Models Provided
+```ruby
+writable_reified_items = snapshot.fetch_reified_items.map{|x| x.instance_variable_set("@readonly", false) }
+```
+
+# Key Models Provided & Additional Customizations
+
+A key aspect of this library is its simplicity and small API. For major functionality customizations we encourage you to first delete this gem and then copy this gems code directly into your repository.
+
+I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
+
 - [Snapshot](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot.rb)
   * Contains a unique `identifier` column
   * `has_many :item_snapshots`
@@ -130,11 +140,6 @@ Note:
   * Defines `snapshots` and `snapshot_items` has_many associations
   * Defines `create_snapshot!` and `has_snapshot_children` methods
 
-# Additional Customizations
-
-A key aspect of this library is its simplicity and small API. For major functionality customizations we encourage you to first delete this gem and then copy this gems code directly into your repository.
-
-I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
 
 # Credits
 
