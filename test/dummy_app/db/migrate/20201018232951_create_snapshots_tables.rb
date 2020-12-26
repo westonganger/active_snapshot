@@ -7,7 +7,6 @@ class CreateSnapshotsTables < ActiveRecord::Migration[6.0]
       t.belongs_to :user, polymorphic: true
       t.jsonb :metadata
       t.datetime :created_at, null: false
-      t.text :children_types
     end
 
     create_table :snapshot_items do |t|
@@ -15,7 +14,7 @@ class CreateSnapshotsTables < ActiveRecord::Migration[6.0]
       t.belongs_to :item, polymorphic: true, null: false, unique: [:snapshot_id], index: true
       t.jsonb :object, null: false
       t.datetime :created_at, null: false
-      t.string :child_type
+      t.string :child_group_name
     end
   end
 

@@ -35,27 +35,24 @@ rails generate active_snapshot:install
 rake db:migrate
 ```
 
-It will also insert `include SnapshotsConcern` to your ApplicationRecord or create an initializer if the ApplicationRecord model doesnt exist.
+To add the snapshot functionality simply add the following line to each applicable model or the `ApplicationRecord`
 
 ```ruby
-# config/initializers/active_snapshot.rb
-
-### Load for all ActiveRecord models
-ActiveSupport.on_load(:active_record) do
-  include SnapshotsConcern
+class ApplicationRecord < ActiveRecord::Base
+  include ActiveSnapshot::SnapshotsConcern
 end
 ```
 
-Now all models inheriting from ActiveRecord::Base have the `SnapshotsConcern` applied which defines the following associations on your models:
+This defines the following associations on your model:
 
 ```ruby
 has_many :snapshots, as: :item, class_name: 'Snapshot'
 has_many :snapshot_items, as: :item, class_name: 'SnapshotItem'
 ```
 
-It defines an optional extension to your models `has_snapshot_children`.
+It defines an optional extension to your model `has_snapshot_children`.
 
-It defines one instance method to your models: `create_snapshot!`
+It defines one instance method to your model: `create_snapshot!`
 
 # Basic Usage
 
@@ -121,7 +118,9 @@ reified_items = snapshot.fetch_reified_items
 As a safety these records have the `@readonly = true` attribute set on them. If you want to perform any write actions on the returned instances you will have to set `@readonly = nil`.
 
 ```ruby
-writable_reified_items = snapshot.fetch_reified_items.map{|x| x.instance_variable_set("@readonly", false) }
+writable_reified_items = snapshot.fetch_reified_items.transform_values do |array| 
+  array.map{|x| x.instance_variable_set("@readonly", false); x}
+end
 ```
 
 # Key Models Provided & Additional Customizations
@@ -130,13 +129,13 @@ A key aspect of this library is its simplicity and small API. For major function
 
 I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
 
-- [Snapshot](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot.rb)
+- [Snapshot](./lib/active_snapshot/snapshot.rb)
   * Contains a unique `identifier` column
   * `has_many :item_snapshots`
-- [SnapshotItem](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshot_item.rb)
+- [SnapshotItem](./lib/active_snapshot/snapshot_item.rb)
   * Contains `object` column with yaml encoded model instance `attributes`
   * `belongs_to :snapshot`
-- [SnapshotsConcern](https://github.com/westonganger/active_snapshot/blob/master/lib/active_snapshot/snapshots_concern.rb)
+- [SnapshotsConcern](./lib/active_snapshot/snapshots_concern.rb)
   * Defines `snapshots` and `snapshot_items` has_many associations
   * Defines `create_snapshot!` and `has_snapshot_children` methods
 

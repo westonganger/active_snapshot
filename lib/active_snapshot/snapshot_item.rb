@@ -1,45 +1,35 @@
-class SnapshotItem < ActiveRecord::Base
-  self.table_name = "snapshot_items"
+module ActiveSnapshot
+  class SnapshotItem < ActiveRecord::Base
+    self.table_name = "snapshot_items"
 
-  belongs_to :snapshot
-  belongs_to :item, polymorphic: true
+    if defined?(ProtectedAttributes)
+      attr_accessible :object, :identifier, :parent_version_id, :item_id, :item_type, :child_group_name
+    end
 
-  validates :item_id, uniqueness: { scope: [:snapshot_id, :item_type] }
-  validates :item_type, uniqueness: { scope: [:snapshot_id, :item_id] }
+    belongs_to :snapshot, class_name: 'ActiveSnapshot::Snapshot'
+    belongs_to :item, polymorphic: true
 
-  def object
-    @object ||= begin
-      if self[:object].present?
-        YAML.load(self[:object]).with_indifferent_access
-      else
-        {}
+    validates :snapshot_id, presence: true
+    validates :item_id, presence: true, uniqueness: { scope: [:snapshot_id, :item_type] }
+    validates :item_type, presence: true, uniqueness: { scope: [:snapshot_id, :item_id] }
+
+    def object
+      @object ||= self[:object].with_indifferent_access
+    end
+
+    def restore_item!
+      ### Add any custom logic here
+
+      if !item
+        item = item_type.constantize.new
       end
-    end
-  end
 
-  def object=(hash)
-    if hash.nil? || hash.empty?
-      self[:object] = nil
-      @object = nil
-    else
-      hash = hash.with_indifferent_access
-      self[:object] = hash.to_yaml
-      @object = hash
-    end
-  end
+      object.each do |k,v|
+        item.send("#{k}=", v)
+      end
 
-  def restore_item!
-    attrs = object
-
-    ### Add custom logic here
-
-    ### If using protected_attributes your going to have to add without_protection: true to both of these assign statements
-    if item
-      item.assign_attributes(attrs)
       item.save!(validate: false)
-    else
-      item_type.constantize.new(attrs).save!(validate: false)
     end
-  end
 
+  end
 end
