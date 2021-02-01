@@ -1,12 +1,20 @@
 default: &default
+<% if defined?(SQLite3) %>
+  adapter: sqlite3
+  database: db/test.sqlite3
+
+<% elsif defined?(Mysql2) %>
+  adapter: mysql2
+  database: active_snapshot_test
+
+<% elsif defined?(PG) %>
   adapter: postgresql
-  encoding: unicode
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  database: active_snapshot_test
+
+<% end %>
 
 development:
   <<: *default
-  database: active_snapshot_development
 
 test:
   <<: *default
-  database: active_snapshot_test

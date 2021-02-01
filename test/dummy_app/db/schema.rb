@@ -12,27 +12,8 @@
 
 ActiveRecord::Schema.define(version: 2020_10_01_061824) do
 
-  create_table "snapshot_items", force: :cascade do |t|
-    t.integer "snapshot_id", null: false
-    t.string "item_type", null: false
-    t.integer "item_id", null: false
-    t.text "object", limit: 1073741823
-    t.datetime "created_at", null: false
-    t.index ["item_type", "item_id"], name: "index_snapshot_items_on_item_type_and_item_id"
-    t.index ["snapshot_id"], name: "index_snapshot_items_on_snapshot_id"
-  end
-
-  create_table "snapshots", force: :cascade do |t|
-    t.string "item_type", null: false
-    t.integer "item_id", null: false
-    t.string "identifier", null: false
-    t.string "user_type"
-    t.integer "user_id"
-    t.text "metadata", limit: 1073741823
-    t.datetime "created_at", null: false
-    t.index ["identifier"], name: "index_snapshots_on_identifier"
-    t.index ["item_type", "item_id"], name: "index_snapshots_on_item_type_and_item_id"
-    t.index ["user_type", "user_id"], name: "index_snapshots_on_user_type_and_user_id"
+  create_table "posts", force: :cascade do |t|
+    t.integer :a, :b
   end
 
 end

@@ -2,10 +2,13 @@ require "test_helper"
 
 class ErrorsTest < ActiveSupport::TestCase
 
-  def setup
+  setup do
   end
 
-  def teardown
+  teardown do
+  end
+
+  def test_error_one
   end
 
 end
