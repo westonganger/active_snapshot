@@ -39,16 +39,18 @@ module ActiveSnapshot
 
       def has_snapshot_children(&block)
         if !block_given? && !@snapshot_children_proc
-          raise ArgumentError.new("`has_snapshot_children` requires block to be defined")
+          raise ArgumentError.new("Invalid `has_snapshot_children` requires block to be defined")
+
         elsif block_given?
           @snapshot_children_proc = block
+
         elsif @snapshot_children_proc
           records = @snapshot_children_proc.call
 
           if records.is_a?(Hash)
             records = records.with_indifferent_access
           else
-            raise Snapshot::ChildrenDefinitionError.new("`Must return a Hash")
+            raise ArgumentError.new("Invalid `has_snapshot_children` definition. Must return a Hash")
           end
 
           snapshot_children = {}
@@ -73,7 +75,7 @@ module ActiveSnapshot
 
                 snapshot_children[assoc_name][:records] = records
               else
-                raise Snapshot::ChildrenDefinitionError.new("Must define a `:records` key for each child association.")
+                raise ArgumentError.new("Invalid `has_snapshot_children` definition. Must define a :records key for each child association.")
               end
 
               delete_method = opts[:delete_method]
@@ -82,11 +84,12 @@ module ActiveSnapshot
                 if delete_method.respond_to?(:call)
                   snapshot_children[assoc_name][:delete_method] = delete_method
                 else
-                  raise Snapshot::ChildrenDefinitionError.new("Invalid `:delete_method` argument. Must be a Lambda / Proc")
+                  raise ArgumentError.new("Invalid `has_snapshot_children` definition. Invalid :delete_method argument. Must be a Lambda / Proc")
                 end
               end
+
             else
-              raise Snapshot::ChildrenDefinitionError.new("Invalid `:records` argument. Must be a Hash or Array")
+              raise ArgumentError.new("Invalid `has_snapshot_children` definition. Invalid :records argument. Must be a Hash or Array")
             end
 
             return snapshot_children

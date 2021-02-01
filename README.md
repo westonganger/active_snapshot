@@ -1,7 +1,7 @@
 # ActiveSnapshot
 
 <a href="https://badge.fury.io/rb/active_snapshot" target="_blank"><img height="21" style='border:0px;height:21px;' border='0' src="https://badge.fury.io/rb/active_snapshot.svg" alt="Gem Version"></a>
-<a href='https://travis-ci.com/westonganger/active_snapshot' target='_blank'><img height='21' style='border:0px;height:21px;' src='https://api.travis-ci.org/westonganger/active_snapshot.svg?branch=master' border='0' alt='Build Status' /></a>
+<img src="https://github.com/westonganger/active_snapshot/workflows/Tests/badge.svg" style="max-width:100%;" height='21' style='border:0px;height:21px;' border='0' alt="CI Status">
 <a href='https://rubygems.org/gems/active_snapshot' target='_blank'><img height='21' style='border:0px;height:21px;' src='https://ruby-gem-downloads-badge.herokuapp.com/active_snapshot?label=rubygems&type=total&total_label=downloads&color=brightgreen' border='0' alt='RubyGems Downloads' /></a>
 
 Simplified snapshots and restoration for ActiveRecord models and associations with a transparent white-box implementation.
@@ -15,10 +15,9 @@ Key Features:
 
 Why This Library:
 
-Model Versioning and Restoration require concious thought, design, and understanding. You should understand your versioning and restoration process completely. This gem's small API and fully understandable design fully supports this. Install this gem and read its code completely OR copy the code straight into your codebase. Know it completely. Now you are free.
+Model Versioning and Restoration require concious thought, design, and understanding. You should understand your versioning and restoration process completely. This gem's small API and fully understandable design fully supports this.
 
-
-If you are considering using [paper_trail-association_tracking](https://github.com/westonganger/paper_trail-association_tracking) then you should think again because PT-AT is mostly a blackbox solution which encourages you to set it up and then assume its "just working<sup>TM</sup>". This makes for major data problems later. Dont fall into this trap.
+I do not recommend using paper_trail-association_tracking because it is mostly a blackbox solution which encourages you to set it up and then assume its "Just working<sup>TM</sup>". This makes for major data problems later. Dont fall into this trap. Instead read this gems brief source code completely before use OR copy the code straight into your codebase. Once you know it, then you are free.
 
 
 
@@ -35,15 +34,15 @@ rails generate active_snapshot:install
 rake db:migrate
 ```
 
-To add the snapshot functionality simply add the following line to each applicable model or the `ApplicationRecord`
+Then add `include ActiveSnapshot` to your ApplicationRecord or individual models.
 
 ```ruby
 class ApplicationRecord < ActiveRecord::Base
-  include ActiveSnapshot::SnapshotsConcern
+  include ActiveSortOrder
 end
 ```
 
-This defines the following associations on your model:
+This defines the following associations on your models:
 
 ```ruby
 has_many :snapshots, as: :item, class_name: 'Snapshot'
@@ -81,7 +80,8 @@ snapshot.destroy!
 # Restoring Associated / Child Records
 
 ```ruby
-class Post
+class Post < ActiveRecord::Base
+  include ActiveSnapshot
   
   has_snapshot_children do
     ### Executed in the context of the instance / self
@@ -129,15 +129,15 @@ A key aspect of this library is its simplicity and small API. For major function
 
 I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
 
+- [SnapshotsConcern](./lib/active_snapshot/snapshots_concern.rb)
+  * Defines `snapshots` and `snapshot_items` has_many associations
+  * Defines `create_snapshot!` and `has_snapshot_children` methods
 - [Snapshot](./lib/active_snapshot/snapshot.rb)
   * Contains a unique `identifier` column
   * `has_many :item_snapshots`
 - [SnapshotItem](./lib/active_snapshot/snapshot_item.rb)
   * Contains `object` column with yaml encoded model instance `attributes`
   * `belongs_to :snapshot`
-- [SnapshotsConcern](./lib/active_snapshot/snapshots_concern.rb)
-  * Defines `snapshots` and `snapshot_items` has_many associations
-  * Defines `create_snapshot!` and `has_snapshot_children` methods
 
 
 # Credits

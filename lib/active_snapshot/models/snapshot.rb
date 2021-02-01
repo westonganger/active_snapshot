@@ -41,6 +41,7 @@ module ActiveSnapshot
 
           cached_snapshot_items.each do |snapshot_item|
             key = "#{snapshot_item.item_type} #{snapshot_item.item_id}"
+
             children_to_keep << key
           end
 
@@ -91,36 +92,6 @@ module ActiveSnapshot
       end
 
       return [reified_parent, reified_children_hash]
-    end
-
-    class ChildrenDefinitionError < ArgumentError
-
-      def initialize(msg)
-        super("Invalid `has_snapshot_children` definition. #{msg}. For example: \n\n#{EXAMPLE}").gsub("..", ".")
-      end
-
-      EXAMPLE = %Q(
-        has_snapshot_children do
-          ### Executed in the context of the instance / self
-
-          ### In this example we just load the current record and all associated records fresh 
-          ### from the database to take advantage of all association preloading / includes
-          
-          instance = self.class.includes(:comments, :ip_address).find(id)
-          
-          {
-            comments: instance.comments,
-            tags: {
-              records: instance.tags
-            },
-            ip_address: {
-              record: instance.ip_address,
-              delete_method: ->(item){ item.release! }
-            }
-          }
-        end
-      ).strip.freeze
-
     end
 
   end
