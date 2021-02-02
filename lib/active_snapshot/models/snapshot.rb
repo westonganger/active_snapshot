@@ -19,12 +19,16 @@ module ActiveSnapshot
       @metadata ||= self[:metadata].with_indifferent_access
     end
 
-    def build_snapshot_item(item, child_group_name: nil)
+    def metadata=(val)
+      @metadata = nil
+      self[:metadata] = val
+    end
+
+    def build_snapshot_item(instance, child_group_name: nil)
       self.snapshot_items.new({
-        object: self.attributes, 
-        identifier: identifier,
-        item_id: item.id,
-        item_type: item.class.name,
+        object: instance.attributes, 
+        item_id: instance.id,
+        item_type: instance.class.name,
         child_group_name: child_group_name,
       })
     end

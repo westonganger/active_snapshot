@@ -3,9 +3,6 @@ require "test_helper"
 class SnapshotItemTest < ActiveSupport::TestCase
 
   def setup
-    @snapshot = Snapshot.includes(:snapshot_items).first
-
-    @snapshot_item = @snapshot.snapshot_items.first
   end
 
   def teardown
@@ -20,6 +17,10 @@ class SnapshotItemTest < ActiveSupport::TestCase
   end
 
   def test_object
+    @snapshot = ActiveSnapshot::Snapshot.includes(:snapshot_items).first
+
+    @snapshot_item = @snapshot.snapshot_items.first
+
     assert @snapshot_item.object.is_a?(HashWithIndifferentAccess)
 
     @snapshot_item.object = {foo: :bar}
@@ -28,6 +29,10 @@ class SnapshotItemTest < ActiveSupport::TestCase
   end
 
   def test_restore_item!
+    @snapshot = ActiveSnapshot::Snapshot.includes(:snapshot_items).first
+
+    @snapshot_item = @snapshot.snapshot_items.first
+
     @snapshot_item.restore_item!
   end
 

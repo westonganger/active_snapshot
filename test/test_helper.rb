@@ -45,6 +45,8 @@ end
 
 klasses = [
   Post,
+  ActiveSnapshot::Snapshot,
+  ActiveSnapshot::SnapshotItem,
 ]
 
 klasses.each do |klass|
@@ -58,10 +60,7 @@ end
 
 DATA = {}.with_indifferent_access
 
-DATA[:posts] = [
-  Post.find_or_create_by!(a: 1, b: 3),
-  Post.find_or_create_by!(a: 2, b: 2),
-  Post.find_or_create_by!(a: 3, b: 2),
-  Post.find_or_create_by!(a: 4, b: 1),
-  Post.find_or_create_by!(a: 5, b: 1),
-].shuffle
+DATA[:post] = Post.find_or_create_by!(a: 1, b: 3)
+DATA[:post].create_snapshot!('v1')
+DATA[:post].update_columns(a: 2, b: 4)
+DATA[:post].create_snapshot!('v2')

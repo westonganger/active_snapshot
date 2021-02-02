@@ -3,7 +3,6 @@ require "test_helper"
 class SnapshotTest < ActiveSupport::TestCase
 
   def setup
-    @snapshot = Snapshot.first
   end
 
   def teardown
@@ -18,6 +17,8 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_metadata
+    @snapshot = ActiveSnapshot::Snapshot.first
+
     assert @snapshot.metadata.is_a?(HashWithIndifferentAccess)
 
     @snapshot.metadata = {foo: :bar}
@@ -26,22 +27,28 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_build_snapshot_item
+    @snapshot = ActiveSnapshot::Snapshot.first
+
     snapshot_item = @snapshot.build_snapshot_item(Post.first)
 
     assert snapshot_item.is_a?(ActiveSnapshot::SnapshotItem)
 
     assert snapshot_item.new_record?
 
-    assert_equal @snapshot.id, snapshot_item.parent_version_id
+    assert_equal @snapshot.id, snapshot_item.snapshot_id
 
-    @snapshot.build_snapshot_item(Post.first, child_type_name: :foobar)
+    @snapshot.build_snapshot_item(Post.first, child_group_name: :foobar)
   end
 
   def test_restore
+    @snapshot = ActiveSnapshot::Snapshot.first
+
     @snapshot.restore!
   end
 
   def test_fetch_reified_items
+    @snapshot = ActiveSnapshot::Snapshot.first
+
     reified_items = @snapshot.fetch_reified_items
 
     assert reified_items.is_a?(Array)
@@ -53,12 +60,6 @@ class SnapshotTest < ActiveSupport::TestCase
     assert children_hash.is_a?(HashWithIndifferentAccess)
 
     assert children_hash.all?{|k,v| v.all?{|x| x.readonly?} }
-  end
-
-  def test_children_definition_error
-    exception = ActiveSnapshot::Snapshot::ChildrenDefinitionError.new("Foobar.")
-
-    assert_equal exception.message, "Invalid `has_snapshot_children` definition. Foobar. For example: \n\n#{exception.class::EXAMPLE}"
   end
 
   def test_kitchen_sink

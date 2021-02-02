@@ -17,8 +17,6 @@ class ActiveSnapshotTest < Minitest::Test
 
     klass = ParentModel
 
-    puts klass.name
-
     parent = klass.first
 
     original_parent_updated_at = parent.updated_at
@@ -28,8 +26,8 @@ class ActiveSnapshotTest < Minitest::Test
 
     children_size = parent.children_to_snapshot.size
 
-    assert_difference ->{ Snapshot.count }, 1 do
-      assert_difference ->{ SnapshotItem.count }, (children_size+1) do
+    assert_difference ->{ ActiveSnapshot::Snapshot.count }, 1 do
+      assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, (children_size+1) do
         @snapshot = parent.create_snapshot!(identifier)
       end
     end
@@ -50,13 +48,13 @@ class ActiveSnapshotTest < Minitest::Test
     parent.reload
     assert_equal (children_size+increase), parent.children_to_snapshot.size
 
-    assert_difference ->{ Snapshot.count }, -1 do
-      assert_difference ->{ SnapshotItem.count }, (-@snapshot.snapshot_items.size) do
+    assert_difference ->{ ActiveSnapshot::Snapshot.count }, -1 do
+      assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, (-@snapshot.snapshot_items.size) do
         @snapshot.restore!(@snapshot)
       end
     end
 
-    assert_equal 0, Snapshot.where(identifier: identifier).count
+    assert_equal 0, ActiveSnapshot::Snapshot.where(identifier: identifier).count
 
     parent.reload
     assert_equal children_size, parent.children_to_snapshot.size

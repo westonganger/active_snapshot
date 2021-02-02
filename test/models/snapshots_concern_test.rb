@@ -13,6 +13,8 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   end
 
   def test_create_snapshot!
+    @post = Post.first
+
     snapshot = @post.create_snapshot!("foobar 1", user: @user, metadata: {foo: :bar})
     assert_not snapshot.new_record?
 

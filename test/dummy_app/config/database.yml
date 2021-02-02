@@ -1,7 +1,7 @@
 default: &default
 <% if defined?(SQLite3) %>
   adapter: sqlite3
-  database: db/test.sqlite3
+  database: ':memory:'
 
 <% elsif defined?(Mysql2) %>
   adapter: mysql2

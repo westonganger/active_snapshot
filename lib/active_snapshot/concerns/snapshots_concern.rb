@@ -9,8 +9,6 @@ module ActiveSnapshot
     end
 
     def create_snapshot!(identifier, user: nil, metadata: nil)
-      snapshot_children = has_snapshot_children
-
       snapshot = snapshots.create!({
         identifier: identifier,
         user_id: (user.id if user),
@@ -20,10 +18,12 @@ module ActiveSnapshot
 
       snapshot_items = []
 
-      snapshot_item << snapshot.build_snapshot_item!(self)
+      snapshot_items << snapshot.build_snapshot_item(self)
+
+      snapshot_children = self.class.has_snapshot_children
 
       if snapshot_children
-        @snapshot_children.each do |child_group_name, h|
+        snapshot_children.each do |child_group_name, h|
           h[:records].each do |child_item|
             snapshot_items << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name)
           end
@@ -38,7 +38,7 @@ module ActiveSnapshot
     class_methods do
 
       def has_snapshot_children(&block)
-        if !block_given? && !@snapshot_children_proc
+        if !block_given? && !defined?(@snapshot_children_proc)
           raise ArgumentError.new("Invalid `has_snapshot_children` requires block to be defined")
 
         elsif block_given?

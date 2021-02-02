@@ -11,6 +11,8 @@ end
 
 task :db_prepare do
   Dir.chdir("test/dummy_app") do
+    `createdb active_snapshot_test` rescue true
+
     ### Instantiates Rails
     require File.expand_path("test/dummy_app/config/environment.rb", __dir__)
 
@@ -18,6 +20,7 @@ task :db_prepare do
 
     ### Generate Migration
     require "generators/active_snapshot/install/install_generator"
+
     generator = ActiveSnapshot::InstallGenerator.new
 
     f = File.join(migration_path, generator.class::MIGRATION_NAME)
@@ -27,7 +30,9 @@ task :db_prepare do
 
     #generator.instance_variable_set(:@migration_path, migration_path)
 
-    generator.create_migration_file
+    silence_warnings do
+      generator.create_migration_file
+    end
   end ### END chdir
 end
 

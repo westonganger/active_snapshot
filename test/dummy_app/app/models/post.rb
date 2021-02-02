@@ -1,5 +1,5 @@
 class Post < ActiveRecord::Base
-  include SnapshotsConcern
+  include ActiveSnapshot
 
   has_snapshot_children do
     {}

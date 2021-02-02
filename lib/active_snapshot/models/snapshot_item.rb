@@ -3,7 +3,7 @@ module ActiveSnapshot
     self.table_name = "snapshot_items"
 
     if defined?(ProtectedAttributes)
-      attr_accessible :object, :identifier, :parent_version_id, :item_id, :item_type, :child_group_name
+      attr_accessible :object, :item_id, :item_type, :child_group_name
     end
 
     belongs_to :snapshot, class_name: 'ActiveSnapshot::Snapshot'
@@ -17,16 +17,19 @@ module ActiveSnapshot
       @object ||= self[:object].with_indifferent_access
     end
 
+    def object=(val)
+      @object = nil
+      self[:object] = val
+    end
+
     def restore_item!
       ### Add any custom logic here
-
+      
       if !item
-        item = item_type.constantize.new
+        self.item = item_type.constantize.new
       end
 
-      object.each do |k,v|
-        item.send("#{k}=", v)
-      end
+      item.assign_attributes(object)
 
       item.save!(validate: false)
     end
