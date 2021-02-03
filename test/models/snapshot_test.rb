@@ -3,21 +3,65 @@ require "test_helper"
 class SnapshotTest < ActiveSupport::TestCase
 
   def setup
+    @snapshot_klass = ActiveSnapshot::Snapshot
   end
 
   def teardown
   end
 
   def test_relationships
-    # TODO
+    shared_post = DATA[:shared_post]
+
+    instance = @snapshot_klass.new
+
+    assert instance.user.nil?
+    assert instance.item.nil?
+    assert instance.snapshot_items.empty?
+
+    instance.user = instance
+    instance.item = instance
+
+    assert_raises do
+      instance.snapshot_items << instance
+    end
+
+    instance.snapshot_items << ActiveSnapshot::SnapshotItem.new
+
+    assert_not instance.user.nil?
+    assert_not instance.item.nil?
+    assert_not instance.snapshot_items.empty?
+
+    instance = @snapshot_klass.new(item: shared_post, user: shared_post)
+
+    assert instance.item.id, shared_post.id
+    assert instance.user.id, shared_post.id
   end
 
   def test_validations
-    # TODO
+    shared_post = DATA[:shared_post]
+    snapshot = shared_post.snapshots.first
+
+    instance = @snapshot_klass.new
+      
+    instance.valid?
+
+    [:item_id, :item_type, :identifier].each do |attr|
+      assert instance.errors[attr].present? ### presence error
+    end
+
+    instance = @snapshot_klass.new(item: snapshot.item, identifier: snapshot.identifier)
+
+    instance.valid?
+
+    assert instance.errors[:identifier].present? ### uniq error
+
+    instance = @snapshot_klass.new(item: snapshot.item, identifier: 'random')
+
+    assert instance.valid?
   end
 
   def test_metadata
-    @snapshot = ActiveSnapshot::Snapshot.first
+    @snapshot = @snapshot_klass.first
 
     assert @snapshot.metadata.is_a?(HashWithIndifferentAccess)
 
@@ -27,7 +71,7 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_build_snapshot_item
-    @snapshot = ActiveSnapshot::Snapshot.first
+    @snapshot = @snapshot_klass.first
 
     snapshot_item = @snapshot.build_snapshot_item(Post.first)
 
@@ -41,13 +85,13 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_restore
-    @snapshot = ActiveSnapshot::Snapshot.first
+    @snapshot = @snapshot_klass.first
 
     @snapshot.restore!
   end
 
   def test_fetch_reified_items
-    @snapshot = ActiveSnapshot::Snapshot.first
+    @snapshot = @snapshot_klass.first
 
     reified_items = @snapshot.fetch_reified_items
 
@@ -60,10 +104,6 @@ class SnapshotTest < ActiveSupport::TestCase
     assert children_hash.is_a?(HashWithIndifferentAccess)
 
     assert children_hash.all?{|k,v| v.all?{|x| x.readonly?} }
-  end
-
-  def test_kitchen_sink
-    # TODO
   end
 
 end

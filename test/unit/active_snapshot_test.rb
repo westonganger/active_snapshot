@@ -1,6 +1,6 @@
 require "test_helper"
 
-class ActiveSnapshotTest < Minitest::Test
+class ActiveSnapshotTest < ActiveSupport::TestCase
 
   def test_exposes_main_module
     assert ActiveSnapshot.is_a?(Module)
@@ -13,18 +13,16 @@ class ActiveSnapshotTest < Minitest::Test
   def test_snapshot_lifecycle
     identifier = "snapshot-1"
 
-    skip("TODO")
-
-    klass = ParentModel
+    klass = Post
 
     parent = klass.first
 
     original_parent_updated_at = parent.updated_at
 
-    child_model = parent.child_models.create!(content: :foo)
-    original_child_updated_at = child_model.updated_at
+    child = parent.comments.create!(content: :foo)
+    original_child_updated_at = child.updated_at
 
-    children_size = parent.children_to_snapshot.size
+    children_size = klass.has_snapshot_children.size
 
     assert_difference ->{ ActiveSnapshot::Snapshot.count }, 1 do
       assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, (children_size+1) do
@@ -36,21 +34,18 @@ class ActiveSnapshotTest < Minitest::Test
 
     parent.touch
 
-    original_child.touch
+    child.touch
 
-    original_child.destroy!
+    child.destroy!
 
-    parent.child_models.create!(content: :foo)
-    parent.child_models.create!(content: :bar)
-
-    increase = 1
+    parent.comments.create!(content: :foo)
+    parent.comments.create!(content: :bar)
 
     parent.reload
-    assert_equal (children_size+increase), parent.children_to_snapshot.size
 
     assert_difference ->{ ActiveSnapshot::Snapshot.count }, -1 do
       assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, (-@snapshot.snapshot_items.size) do
-        @snapshot.restore!(@snapshot)
+        @snapshot.restore!
       end
     end
 

@@ -60,7 +60,7 @@ end
 
 DATA = {}.with_indifferent_access
 
-DATA[:post] = Post.find_or_create_by!(a: 1, b: 3)
-DATA[:post].create_snapshot!('v1')
-DATA[:post].update_columns(a: 2, b: 4)
-DATA[:post].create_snapshot!('v2')
+DATA[:shared_post] = Post.find_or_create_by!(a: 1, b: 3)
+DATA[:shared_post].create_snapshot!('v1')
+DATA[:shared_post].update_columns(a: 2, b: 4)
+DATA[:shared_post].create_snapshot!('v2')

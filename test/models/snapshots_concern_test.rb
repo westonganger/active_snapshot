@@ -9,7 +9,25 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   end
 
   def test_relationships
-    # TODO
+    instance = Post.new
+
+    assert instance.snapshots.empty?
+    assert instance.snapshot_items.empty?
+
+    assert_raises do
+      instance.snapshots << instance
+    end
+
+    instance.snapshots << ActiveSnapshot::Snapshot.new
+
+    assert_raises do
+      instance.snapshot_items << instance
+    end
+
+    instance.snapshot_items << ActiveSnapshot::SnapshotItem.new
+
+    assert_not instance.snapshots.empty?
+    assert_not instance.snapshot_items.empty?
   end
 
   def test_create_snapshot!
@@ -30,11 +48,62 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   end
 
   def test_has_snapshot_children
-    # TODO
-  end
+    klass = VolatilePost
 
-  def test_kitchen_sink
-    # TODO
+    assert_raise ArgumentError do
+      klass.has_snapshot_children
+    end
+
+    klass.has_snapshot_children do
+      {}
+    end
+
+    assert klass.instance_variable_get(:@snapshot_children_proc).is_a?(Proc)
+
+    klass.has_snapshot_children
+
+    invalid = [
+      "foobar",
+      true,
+      false,
+      nil,
+      "",
+      [],
+      [:foobar, 123],
+      {foo: :bar},
+      {foo: {}},
+      {foo: {records: 'bar', delete_method: 'bar'}},
+    ]
+
+    invalid.each do |x|
+      klass.has_snapshot_children do
+        x
+      end
+
+      assert_raise ArgumentError do
+        klass.has_snapshot_children
+      end
+    end
+
+    valid = [
+      {},
+      {foo: []},
+      {foo: [:foobar, 123]},
+      {foo: {record: 'bar'}},
+      {foo: {records: 'bar'}},
+      {foo: {record: Post.limit(1) }},
+      {foo: {records: Post.limit(1) }},
+      {foo: {records: [], delete_method: ->(){} }},
+      {foo: {records: [], delete_method: proc{} }},
+    ]
+
+    valid.each do |x|
+      klass.has_snapshot_children do
+        x
+      end
+
+      klass.has_snapshot_children
+    end
   end
 
 end

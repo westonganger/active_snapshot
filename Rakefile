@@ -10,9 +10,18 @@ Rake::TestTask.new(:test) do |t|
 end
 
 task :db_prepare do
-  Dir.chdir("test/dummy_app") do
-    `createdb active_snapshot_test` rescue true
+  if ENV['CI'] != "true"
+    begin
+      require 'pg'
 
+      ### FOR LOCAL TESTING
+      `dropdb active_snapshot_test && createdb active_snapshot_test` rescue true
+    rescue LoadError
+      # Do nothing
+    end
+  end
+
+  Dir.chdir("test/dummy_app") do
     ### Instantiates Rails
     require File.expand_path("test/dummy_app/config/environment.rb", __dir__)
 
@@ -23,16 +32,11 @@ task :db_prepare do
 
     generator = ActiveSnapshot::InstallGenerator.new
 
-    f = File.join(migration_path, generator.class::MIGRATION_NAME)
-    if File.exist?(f)
+    Dir.glob(Rails.root.join(migration_path, "*#{generator.class::MIGRATION_NAME}.rb")).each do |f|
       FileUtils.rm(f)
     end
 
-    #generator.instance_variable_set(:@migration_path, migration_path)
-
-    silence_warnings do
-      generator.create_migration_file
-    end
+    generator.create_migration_file
   end ### END chdir
 end
 
@@ -41,7 +45,7 @@ task default: [:db_prepare, :test]
 task :console do
   require 'active_snapshot'
 
-  require 'test/dummy_app/app/models/post'
+  require_relative 'test/dummy_app/app/models/post'
 
   require 'irb'
   binding.irb

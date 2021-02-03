@@ -9,6 +9,7 @@ gemfiles/*.lock
 .DS_Store
 ~.*
 ~*
+Gemfile.lock
 
 /tmp/
 /test/**/tmp/
