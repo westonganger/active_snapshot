@@ -129,13 +129,13 @@ A key aspect of this library is its simplicity and small API. For major function
 
 I strongly encourage you to read the code for this library to understand how it works within your project so that you are capable of customizing the functionality later.
 
-- [SnapshotsConcern](./lib/active_snapshot/snapshots_concern.rb)
+- [SnapshotsConcern](./lib/active_snapshot/models/concerns/snapshots_concern.rb)
   * Defines `snapshots` and `snapshot_items` has_many associations
   * Defines `create_snapshot!` and `has_snapshot_children` methods
-- [Snapshot](./lib/active_snapshot/snapshot.rb)
+- [Snapshot](./lib/active_snapshot/models/snapshot.rb)
   * Contains a unique `identifier` column
   * `has_many :item_snapshots`
-- [SnapshotItem](./lib/active_snapshot/snapshot_item.rb)
+- [SnapshotItem](./lib/active_snapshot/models/snapshot_item.rb)
   * Contains `object` column with yaml encoded model instance `attributes`
   * `belongs_to :snapshot`
 

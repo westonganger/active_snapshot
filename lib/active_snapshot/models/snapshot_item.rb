@@ -26,12 +26,14 @@ module ActiveSnapshot
       ### Add any custom logic here
       
       if !item
-        self.item = item_type.constantize.new
+        item_klass = item_type.constantize
+
+        self.item = item_klass.new
       end
 
       item.assign_attributes(object)
 
-      item.save!(validate: false)
+      item.save!(validate: false, touch: false)
     end
 
   end

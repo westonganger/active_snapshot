@@ -33,6 +33,8 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   def test_create_snapshot!
     @post = Post.first
 
+    #@user = User.first
+
     snapshot = @post.create_snapshot!("foobar 1", user: @user, metadata: {foo: :bar})
     assert_not snapshot.new_record?
 
@@ -49,7 +51,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
 
   def test_has_snapshot_children
     klass = VolatilePost
-
+    
     assert_raise ArgumentError do
       klass.has_snapshot_children
     end
@@ -60,7 +62,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
 
     assert klass.instance_variable_get(:@snapshot_children_proc).is_a?(Proc)
 
-    klass.has_snapshot_children
+    klass.new.children_to_snapshot
 
     invalid = [
       "foobar",
@@ -81,7 +83,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
       end
 
       assert_raise ArgumentError do
-        klass.has_snapshot_children
+        klass.new.children_to_snapshot
       end
     end
 
@@ -102,7 +104,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
         x
       end
 
-      klass.has_snapshot_children
+      klass.new.children_to_snapshot
     end
   end
 

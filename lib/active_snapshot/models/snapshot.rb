@@ -38,9 +38,9 @@ module ActiveSnapshot
         ### Cache the child snapshots in a variable for re-use
         cached_snapshot_items = snapshot_items.includes(:item)
 
-        snapshot_children = item.class.has_snapshot_children
+        existing_snapshot_children = item ? item.children_to_snapshot : []
 
-        if snapshot_children
+        if existing_snapshot_children.any?
           children_to_keep = Set.new
 
           cached_snapshot_items.each do |snapshot_item|
@@ -51,11 +51,13 @@ module ActiveSnapshot
 
           ### Destroy or Detach Items not included in this Snapshot's Items
           ### We do this first in case you later decide to validate children in ItemSnapshot#restore_item! method
-          snapshot_children.each do |child_group_name, h|
+          existing_snapshot_children.each do |child_group_name, h|
             delete_method = h[:delete_method] || ->(child_record){ child_record.destroy! }
 
             h[:records].each do |child_record|
-              key = "#{child_record.class.name} #{child_record.id}"
+              child_record_id = child_record.send(child_record.class.send(:primary_key))
+
+              key = "#{child_record.class.name} #{child_record_id}"
 
               if children_to_keep.exclude?(key)
                 delete_method.call(child_record)

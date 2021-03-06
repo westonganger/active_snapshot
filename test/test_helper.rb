@@ -64,3 +64,8 @@ DATA[:shared_post] = Post.find_or_create_by!(a: 1, b: 3)
 DATA[:shared_post].create_snapshot!('v1')
 DATA[:shared_post].update_columns(a: 2, b: 4)
 DATA[:shared_post].create_snapshot!('v2')
+
+def assert_time_match(a, b)
+  format = "%d-%m-%Y %h:%M:%S.%L" ### MUST LIMIT THE MILLISECONDS TO 3 decimal places of accuracy, the rest are dropped
+  assert_equal a.strftime(format), b.strftime(format)
+end
