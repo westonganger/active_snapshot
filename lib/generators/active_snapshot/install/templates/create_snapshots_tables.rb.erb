@@ -1,4 +1,4 @@
-class <%= migration_name %> < ActiveRecord::Migration<%= migration_version %>
+class <%= migration_name %> < ActiveRecord::Migration::Current
 
   def change
     create_table :snapshots<%= table_options %> do |t|

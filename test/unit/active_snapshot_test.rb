@@ -22,15 +22,11 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
     child = parent.comments.create!(content: :foo)
     original_child_updated_at = child.updated_at
 
-    orig_comments_size = parent.children_to_snapshot[:comments][:records].count
-
     assert_difference ->{ ActiveSnapshot::Snapshot.count }, 1 do
-      assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, (orig_comments_size+1) do
+      assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, 2 do
         @snapshot = parent.create_snapshot!(identifier)
       end
     end
-
-    assert_equal (orig_comments_size+1), @snapshot.snapshot_items.size
 
     parent.update_columns(updated_at: 1.day.from_now)
 
@@ -51,7 +47,7 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
 
     parent.reload
 
-    assert_equal orig_comments_size, parent.children_to_snapshot[:comments][:records].count
+    assert_equal 1, parent.children_to_snapshot[:comments][:records].count
 
     ### Test Data Chang
     assert_time_match original_parent_updated_at, parent.updated_at

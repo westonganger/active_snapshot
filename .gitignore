@@ -6,6 +6,7 @@
 /pkg/
 /spec/reports/
 gemfiles/*.lock
+gemfiles/.bundle
 .DS_Store
 ~.*
 ~*

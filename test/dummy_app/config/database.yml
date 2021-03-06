@@ -1,15 +1,15 @@
 default: &default
-<% if defined?(SQLite3) %>
-  adapter: sqlite3
-  database: ':memory:'
-
-<% elsif defined?(Mysql2) %>
+<% if defined?(Mysql2) %>
   adapter: mysql2
-  database: active_snapshot_test
+  database: active_sort_order_test
 
 <% elsif defined?(PG) %>
   adapter: postgresql
-  database: active_snapshot_test
+  database: active_sort_order_test
+  
+<% elsif defined?(SQLite3) %>
+  adapter: sqlite3
+  database: db/test.sqlite3
 
 <% end %>
 

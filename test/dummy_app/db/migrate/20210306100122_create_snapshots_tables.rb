@@ -1,4 +1,4 @@
-class CreateSnapshotsTables < ActiveRecord::Migration[6.1]
+class CreateSnapshotsTables < ActiveRecord::Migration::Current
 
   def change
     create_table :snapshots do |t|

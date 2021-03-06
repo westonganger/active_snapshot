@@ -6,6 +6,50 @@ on:
     branches: ['*']
 
 jobs:
+  test_sqlite:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          ### TEST ALL RUBY VERSIONS, USE DEFAULT GEMFILE
+          - ruby: 2.3
+          - ruby: 2.4
+          - ruby: 2.5
+          - ruby: 2.6
+          - ruby: 2.7
+          - ruby: 3.0
+
+          ### RAILS VERSION TESTING
+          - ruby: 2.6
+            gemfile: gemfiles/rails_5.2.sqlite3.gemfile
+          - ruby: 2.6
+            gemfile: gemfiles/rails_6.0.sqlite3.gemfile
+          - ruby: 2.6
+            gemfile: gemfiles/rails_6.1.sqlite3.gemfile
+
+    env:
+      BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "${{ matrix.ruby }}"
+
+    - name: Bundle
+      run: |
+        gem install bundler:1.17.3
+        bundle _1.17.3_ install
+
+    - name: Run tests
+      run: |
+        #bundle exec rake db:test:prepare
+        bundle exec rake
+
+
   test_mysql:
     runs-on: ubuntu-20.04
     services:
@@ -22,17 +66,17 @@ jobs:
       matrix:
         include:
           ### RAILS VERSION TESTING
-          ### DONT WORRY ABOUT TESTING ALL RUBY VERSIONS. THIS IS COVERED IN THE PG TESTS
+          ### DONT WORRY ABOUT TESTING ALL RUBY VERSIONS. THIS IS COVERED IN THE SQLITE3 TESTS
           - ruby: 2.6
-            gemfile: gemfiles/rails-5.0.mysql2
+            gemfile: gemfiles/rails_5.0.mysql2.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-5.1.mysql2
+            gemfile: gemfiles/rails_5.1.mysql2.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-5.2.mysql2
+            gemfile: gemfiles/rails_5.2.mysql2.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-6.0.mysql2
+            gemfile: gemfiles/rails_6.0.mysql2.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-6.1.mysql2
+            gemfile: gemfiles/rails_6.1.mysql2.gemfile
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
@@ -73,25 +117,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          ### TEST ALL RUBY VERSIONS, USE DEFAULT GEMFILE
-          - ruby: 2.3
-          - ruby: 2.4
-          - ruby: 2.5
-          - ruby: 2.6
-          - ruby: 2.7
-          - ruby: 3.0
-
           ### RAILS VERSION TESTING
+          ### DONT WORRY ABOUT TESTING ALL RUBY VERSIONS. THIS IS COVERED IN THE SQLITE3 TESTS
           - ruby: 2.6
-            gemfile: gemfiles/rails-5.0.pg
+            gemfile: gemfiles/rails_5.0.pg.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-5.1.pg
+            gemfile: gemfiles/rails_5.1.pg.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-5.2.pg
+            gemfile: gemfiles/rails_5.2.pg.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-6.0.pg
+            gemfile: gemfiles/rails_6.0.pg.gemfile
           - ruby: 2.6
-            gemfile: gemfiles/rails-6.1.pg
+            gemfile: gemfiles/rails_6.1.pg.gemfile
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
