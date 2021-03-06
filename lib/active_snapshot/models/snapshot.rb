@@ -16,12 +16,12 @@ module ActiveSnapshot
     validates :user_type, presence: true, if: :user_id
 
     def metadata
-      @metadata ||= self[:metadata].with_indifferent_access
+      @metadata ||= YAML.load(self[:metadata]).with_indifferent_access
     end
 
-    def metadata=(val)
+    def metadata=(h)
       @metadata = nil
-      self[:metadata] = val
+      self[:metadata] = YAML.dump(h)
     end
 
     def build_snapshot_item(instance, child_group_name: nil)

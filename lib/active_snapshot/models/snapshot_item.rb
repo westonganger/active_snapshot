@@ -14,12 +14,12 @@ module ActiveSnapshot
     validates :item_type, presence: true, uniqueness: { scope: [:snapshot_id, :item_id] }
 
     def object
-      @object ||= self[:object].with_indifferent_access
+      @object ||= YAML.load(self[:object]).with_indifferent_access
     end
 
-    def object=(val)
+    def object=(h)
       @object = nil
-      self[:object] = val
+      self[:object] = YAML.dump(h)
     end
 
     def restore_item!

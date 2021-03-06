@@ -5,14 +5,14 @@ class <%= migration_name %> < ActiveRecord::Migration::Current
       t.belongs_to :item, polymorphic: true, null: false, index: true
       t.string :identifier, null: false, unique: true, index: true
       t.belongs_to :user, polymorphic: true
-      t.json :metadata
+      t.text :metadata
       t.datetime :created_at, null: false
     end
 
     create_table :snapshot_items<%= table_options %> do |t|
       t.belongs_to :snapshot, null: false, index: true
       t.belongs_to :item, polymorphic: true, null: false, unique: [:snapshot_id], index: true
-      t.json :object, null: false
+      t.text :object, null: false
       t.datetime :created_at, null: false
       t.string :child_group_name
     end

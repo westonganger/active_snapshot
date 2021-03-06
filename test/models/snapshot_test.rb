@@ -67,7 +67,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     @snapshot.metadata = {foo: :bar}
 
-    assert_equal 'bar', @snapshot.metadata['foo']
+    assert_equal :bar, @snapshot.metadata['foo']
   end
 
   def test_build_snapshot_item
