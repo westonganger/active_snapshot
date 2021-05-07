@@ -106,6 +106,12 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
 
       klass.new.children_to_snapshot
     end
+
+    klass.has_snapshot_children do
+      {foo: {records: 'bar'}, baz: {records: 'barbaz'}}
+    end
+
+    assert klass.new.children_to_snapshot.count == 2
   end
 
 end

@@ -14,6 +14,14 @@ class SetUpTestTables < ActiveRecord::Migration::Current
 
       t.timestamps
     end
+
+    create_table :notes do |t|
+      t.string :body
+
+      t.references :post
+
+      t.timestamps
+    end
   end
 
 end

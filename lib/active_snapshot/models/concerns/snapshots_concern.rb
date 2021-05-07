@@ -101,9 +101,9 @@ module ActiveSnapshot
           else
             raise ArgumentError.new("Invalid `has_snapshot_children` definition. Invalid :records argument. Must be a Hash or Array")
           end
-
-          return snapshot_children
         end
+
+        return snapshot_children
       end
     end
 

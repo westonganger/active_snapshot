@@ -2,12 +2,14 @@ class Post < ActiveRecord::Base
   include ActiveSnapshot
 
   has_many :comments
+  has_many :notes
 
   has_snapshot_children do
-    instance = self.class.includes(:comments).find(id)
+    instance = self.class.includes(:comments, :notes).find(id)
 
     {
       comments: instance.comments,
+      notes: instance.notes,
     }
   end
 end
