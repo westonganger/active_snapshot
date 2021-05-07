@@ -2,6 +2,7 @@ CHANGELOG
 ---------
 
 - **Unreleased**
+  * [PR #1](https://github.com/westonganger/active_snapshot/pull/1) - Fix bug where only the first child association would be captured
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.1.0...master)
   * Nothing yet
 
