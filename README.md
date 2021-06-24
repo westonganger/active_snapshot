@@ -38,7 +38,7 @@ Then add `include ActiveSnapshot` to your ApplicationRecord or individual models
 
 ```ruby
 class ApplicationRecord < ActiveRecord::Base
-  include ActiveSortOrder
+  include ActiveSnapshot
 end
 ```
 
