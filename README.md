@@ -87,14 +87,19 @@ class Post < ActiveRecord::Base
     ### Executed in the context of the instance / self
 
     ### In this example, we choose to do a fresh load from the database of the record and all associated records from the database
-    instance = self.class.includes(:comments, :ip_address).find(id)
+    instance = self.class.includes(:tags, :ip_address, comments: [:comment_sub_records]).find(id)
     
     ### Define the associated records that will be restored
     {
       comments: instance.comments,
+      
+      ### to handle any nested associations simply map them into an array
+      comment_sub_records: instance.comments.flat_map{|x| x.comment_sub_records }, 
+      
       tags: {
         records: instance.tags
       },
+      
       ip_address: {
         record: instance.ip_address,
         delete_method: ->(item){ item.release! }
