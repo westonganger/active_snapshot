@@ -49,7 +49,7 @@ has_many :snapshots, as: :item, class_name: 'Snapshot'
 has_many :snapshot_items, as: :item, class_name: 'SnapshotItem'
 ```
 
-It defines an optional extension to your model `has_snapshot_children`.
+It defines an optional extension to your model: `has_snapshot_children`.
 
 It defines one instance method to your model: `create_snapshot!`
 
