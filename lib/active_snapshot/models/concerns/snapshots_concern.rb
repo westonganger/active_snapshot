@@ -53,7 +53,7 @@ module ActiveSnapshot
       snapshot_children_proc = self.class.has_snapshot_children
 
       if !snapshot_children_proc
-        raise ArgumentError.new("`has_snapshot_children` must be defined on your class")
+        return {}
       else
         records = self.instance_exec(&snapshot_children_proc)
 
