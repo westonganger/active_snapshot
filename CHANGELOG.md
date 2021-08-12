@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.0...master)
-  * Nothing yet
+  * [PR #7](https://github.com/westonganger/active_snapshot/pull/7) - Allow `has_snapshot_children` to be undefined for tracking only top level changes.
 
 - **v0.2.0** - May 7, 2021
   * [PR #1](https://github.com/westonganger/active_snapshot/pull/1) - Fix bug where only the first child association would be captured
