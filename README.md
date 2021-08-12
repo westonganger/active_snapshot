@@ -86,7 +86,7 @@ class Post < ActiveRecord::Base
   has_snapshot_children do
     ### Executed in the context of the instance / self
 
-    ### In this example, we choose to do a fresh load from the database of the record and all associated records from the database
+    ### Reload record from database to ensure a clean state and eager load the specified associations
     instance = self.class.includes(:tags, :ip_address, comments: [:comment_sub_records]).find(id)
     
     ### Define the associated records that will be restored
