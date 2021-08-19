@@ -1,8 +1,12 @@
 CHANGELOG
 ---------
 
-- **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.0...master)
+- **UNRELEASED**
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.1...master)
+  * Nothing yet
+
+- **v0.2.1** - August 19, 2021
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.0...v0.2.1)
   * [76b6bd9](https://github.com/westonganger/active_snapshot/commit/76b6bd951f73b277891976c458a0cdef0bd77af5) - Improve `has_snapshot_children` method to support single records and nil values which can occur with has_one/belongs_to relationships
   * [PR #7](https://github.com/westonganger/active_snapshot/pull/7) - Allow `has_snapshot_children` to be undefined for tracking only top level changes.
 
