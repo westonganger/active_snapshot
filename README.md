@@ -93,7 +93,7 @@ class Post < ActiveRecord::Base
     {
       comments: instance.comments,
       
-      ### to handle any nested associations simply map them into an array
+      ### Nested Associations can be handled by simply mapping them into an array
       comment_sub_records: instance.comments.flat_map{|x| x.comment_sub_records }, 
       
       tags: {
