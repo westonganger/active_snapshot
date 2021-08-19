@@ -3,6 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.0...master)
+  * Improve `has_snapshot_children` method to support single records and nil values which can occur with has_one/belongs_to relationships
   * [PR #7](https://github.com/westonganger/active_snapshot/pull/7) - Allow `has_snapshot_children` to be undefined for tracking only top level changes.
 
 - **v0.2.0** - May 7, 2021

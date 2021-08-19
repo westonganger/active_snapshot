@@ -73,7 +73,6 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
       [],
       [:foobar, 123],
       {foo: :bar},
-      {foo: {}},
       {foo: {records: 'bar', delete_method: 'bar'}},
     ]
 
@@ -90,6 +89,8 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
     valid = [
       {},
       {foo: []},
+      {foo: {}},
+      {foo: Post.limit(1)},
       {foo: [:foobar, 123]},
       {foo: {record: 'bar'}},
       {foo: {records: 'bar'}},
@@ -97,6 +98,8 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
       {foo: {records: Post.limit(1) }},
       {foo: {records: [], delete_method: ->(){} }},
       {foo: {records: [], delete_method: proc{} }},
+      {foo: nil},
+      {foo: {records: nil}},
     ]
 
     valid.each do |x|

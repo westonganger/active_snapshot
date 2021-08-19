@@ -68,15 +68,28 @@ module ActiveSnapshot
         records.each do |assoc_name, opts|
           snapshot_children[assoc_name] = {}
 
-          if opts.is_a?(ActiveRecord::Relation) || opts.is_a?(Array)
+          if opts.nil?
+            next # skip, nil is allowed value in case has_one/belongs_to is nil, etc.
+
+          elsif opts.is_a?(ActiveRecord::Base)
+            ### Support belongs_to / has_one
+            snapshot_children[assoc_name][:records] = [opts]
+
+          elsif opts.is_a?(ActiveRecord::Relation) || opts.is_a?(Array)
             snapshot_children[assoc_name][:records] = opts
 
           elsif opts.is_a?(Hash)
             opts = opts.with_indifferent_access
 
-            records = opts[:records] || opts[:record]
+            if opts.has_key?(:records)
+              records = opts[:records]
+            elsif opts.has_key?(:record)
+              records = opts[:record]
+            end
 
-            if records
+            if records.nil?
+              # Do nothing, allow nil value in case a has_one/belong_to returns nil, etc.
+            elsif records
               if records.respond_to?(:to_a)
                 records = records.to_a
               else
