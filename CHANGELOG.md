@@ -2,8 +2,12 @@ CHANGELOG
 ---------
 
 - **UNRELEASED**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.1...master)
-  * [](https://github.com/westonganger/active_snapshot/commit/) - Fix bug on restore for in `has_snapshot_children` method with nil association values
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.2...master)
+  * Nothing yet
+
+- **v0.2.2** - August 27, 2021
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.1...v0.2.2)
+  * [0715279](https://github.com/westonganger/active_snapshot/commit/0715279) - Fix bug on restore for in `has_snapshot_children` method with nil association values
 
 - **v0.2.1** - August 19, 2021
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.0...v0.2.1)
