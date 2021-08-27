@@ -3,7 +3,7 @@ CHANGELOG
 
 - **UNRELEASED**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.1...master)
-  * Nothing yet
+  * [](https://github.com/westonganger/active_snapshot/commit/) - Fix bug on restore for in `has_snapshot_children` method with nil association values
 
 - **v0.2.1** - August 19, 2021
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.0...v0.2.1)

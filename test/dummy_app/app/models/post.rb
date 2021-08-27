@@ -10,6 +10,7 @@ class Post < ActiveRecord::Base
     {
       comments: instance.comments,
       notes: instance.notes,
+      nil_assoc: nil,
     }
   end
 end

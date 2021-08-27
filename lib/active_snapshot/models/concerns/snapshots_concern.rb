@@ -69,7 +69,8 @@ module ActiveSnapshot
           snapshot_children[assoc_name] = {}
 
           if opts.nil?
-            next # skip, nil is allowed value in case has_one/belongs_to is nil, etc.
+            ### nil is allowed value in case has_one/belongs_to is nil, etc.
+            snapshot_children[assoc_name][:records] = []
 
           elsif opts.is_a?(ActiveRecord::Base)
             ### Support belongs_to / has_one
