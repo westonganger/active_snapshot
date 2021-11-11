@@ -3,7 +3,7 @@ CHANGELOG
 
 - **UNRELEASED**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.2...master)
-  * Nothing yet
+  * Fix unique constraint on snapshots.identifier column
 
 - **v0.2.2** - August 27, 2021
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.1...v0.2.2)
