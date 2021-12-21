@@ -1,5 +1,14 @@
 ["sqlite3", "mysql2", "pg"].each do |db_gem|
 
+  appraise "rails_7.0.#{db_gem}" do
+    gem "rails", "~> 7.0.0"
+    gem db_gem
+
+    if db_gem != "sqlite3"
+      remove_gem "sqlite3"
+    end
+  end
+
   appraise "rails_6.1.#{db_gem}" do
     gem "rails", "~> 6.1.1"
     gem db_gem
