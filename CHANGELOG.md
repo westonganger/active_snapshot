@@ -2,7 +2,11 @@ CHANGELOG
 ---------
 
 - **UNRELEASED**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.2...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.3...master)
+  * Nothing yet
+
+- **UNRELEASED**
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.2...v0.2.3)
   * Support Ruby 3.1
   * Fix unique constraint on snapshots.identifier column
 
