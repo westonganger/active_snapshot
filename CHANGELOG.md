@@ -5,9 +5,9 @@ CHANGELOG
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.3...master)
   * Nothing yet
 
-- **UNRELEASED**
+- **v0.2.3** - Jan 7, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.2...v0.2.3)
-  * Support Ruby 3.1
+  * Support Ruby 3.1 using `YAML.unsafe_load`
   * Fix unique constraint on snapshots.identifier column
 
 - **v0.2.2** - August 27, 2021
