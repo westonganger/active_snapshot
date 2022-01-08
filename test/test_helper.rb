@@ -50,7 +50,7 @@ klasses = [
 ]
 
 klasses.each do |klass|
-  if defined?(SQLite3)
+  if klass.connection.adapter_name.downcase.include?("sqlite")
     ActiveRecord::Base.connection.execute("DELETE FROM #{klass.table_name};")
     ActiveRecord::Base.connection.execute("UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = '#{klass.table_name}';")
   else

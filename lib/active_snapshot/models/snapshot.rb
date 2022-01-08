@@ -16,7 +16,13 @@ module ActiveSnapshot
     validates :user_type, presence: true, if: :user_id
 
     def metadata
-      @metadata ||= YAML.load(self[:metadata]).with_indifferent_access
+      yaml_method = "unsafe_load"
+
+      if !YAML.respond_to?("unsafe_load")
+        yaml_method = "load"
+      end
+
+      @metadata ||= YAML.send(yaml_method, self[:metadata]).with_indifferent_access
     end
 
     def metadata=(h)

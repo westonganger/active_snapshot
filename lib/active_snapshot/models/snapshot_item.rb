@@ -14,7 +14,13 @@ module ActiveSnapshot
     validates :item_type, presence: true, uniqueness: { scope: [:snapshot_id, :item_id] }
 
     def object
-      @object ||= YAML.load(self[:object]).with_indifferent_access
+      yaml_method = "unsafe_load"
+
+      if !YAML.respond_to?("unsafe_load")
+        yaml_method = "load"
+      end
+
+      @metadata ||= YAML.send(yaml_method, self[:object]).with_indifferent_access
     end
 
     def object=(h)
