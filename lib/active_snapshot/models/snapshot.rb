@@ -98,7 +98,7 @@ module ActiveSnapshot
 
           reified_children_hash[key] << reified_item
 
-        elsif [self.item_id, self.item_type] == [si.item_id, si.item_type]
+        elsif self.item_id == si.item_id && si.item_type.constantize.new.is_a?(self.item_type.constantize)
           reified_parent = reified_item
         end
       end
