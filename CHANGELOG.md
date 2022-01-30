@@ -3,7 +3,7 @@ CHANGELOG
 
 - **UNRELEASED**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.3...master)
-  * Nothing yet
+  * [PR #18](https://github.com/westonganger/active_snapshot/pull/18) - Fix bug where sub-classes of a model would not be assigned correctly as parent when restoring
 
 - **v0.2.3** - Jan 7, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.2...v0.2.3)
