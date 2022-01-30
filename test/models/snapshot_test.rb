@@ -106,4 +106,16 @@ class SnapshotTest < ActiveSupport::TestCase
     assert children_hash.all?{|k,v| v.all?{|x| x.readonly?} }
   end
 
+  def test_fetch_reified_items_with_sti_class
+    post = SubPost.create!(a: 1, b: 2)
+    comment_content = 'Example comment'
+    post.comments.create!(content: comment_content)
+    post.create_snapshot!('v1')
+    snapshot = post.snapshots.first
+    reified_items = snapshot.fetch_reified_items
+
+    assert_equal post, reified_items.first
+    assert reified_items.first.readonly?
+    assert_equal comment_content, reified_items.second[:comments].first.content
+  end
 end
