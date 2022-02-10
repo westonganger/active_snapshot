@@ -37,6 +37,8 @@ module ActiveSnapshot
 
     class_methods do
 
+      attr_reader :snapshot_children_proc
+
       def has_snapshot_children(&block)
         if !block_given? && !defined?(@snapshot_children_proc)
           raise ArgumentError.new("Invalid `has_snapshot_children` requires block to be defined")
@@ -50,7 +52,7 @@ module ActiveSnapshot
     end
 
     def children_to_snapshot
-      snapshot_children_proc = self.class.has_snapshot_children
+      snapshot_children_proc = self.class.snapshot_children_proc
 
       if !snapshot_children_proc
         return {}
