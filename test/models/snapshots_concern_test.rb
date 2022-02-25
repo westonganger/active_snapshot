@@ -52,9 +52,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   def test_has_snapshot_children
     klass = VolatilePost
     
-    assert_raise ArgumentError do
-      klass.has_snapshot_children
-    end
+    assert_nil klass.has_snapshot_children
 
     klass.has_snapshot_children do
       {}

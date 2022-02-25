@@ -118,4 +118,23 @@ class SnapshotTest < ActiveSupport::TestCase
     assert reified_items.first.readonly?
     assert_equal comment_content, reified_items.second[:comments].first.content
   end
+
+  def test_single_model_snapshots_without_children
+    instance = ParentWithoutChildren.create!({a: 1, b: 2})
+
+    previous_attributes = instance.attributes
+
+    instance.create_snapshot!('v1')
+
+    instance.update!(a: 9, b: 9)
+
+    snapshot = instance.snapshots.first
+
+    reified_items = snapshot.fetch_reified_items
+
+    assert_equal [instance, {}], reified_items
+
+    assert_equal previous_attributes, reified_items.first.attributes
+  end
+
 end
