@@ -77,7 +77,7 @@ snapshot.restore!
 snapshot.destroy!
 ```
 
-# Restoring Associated / Child Records
+# Tracking Associated / Child Records
 
 ```ruby
 class Post < ActiveRecord::Base
