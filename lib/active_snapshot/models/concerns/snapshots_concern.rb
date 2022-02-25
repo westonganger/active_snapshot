@@ -38,9 +38,7 @@ module ActiveSnapshot
     class_methods do
 
       def has_snapshot_children(&block)
-        if !block_given? && !defined?(@snapshot_children_proc)
-          raise ArgumentError.new("Invalid `has_snapshot_children` requires block to be defined")
-        elsif block_given?
+        if block_given?
           @snapshot_children_proc = block
         else
           @snapshot_children_proc
