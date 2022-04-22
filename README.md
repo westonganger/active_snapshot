@@ -117,15 +117,15 @@ Now when you run `create_snapshot!` the associations will be tracked accordingly
 You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data. 
 
 ```ruby
-reified_items = snapshot.fetch_reified_items
+reified_parent, reified_children_hash = snapshot.fetch_reified_items
 ```
 
 As a safety these records have the `@readonly = true` attribute set on them. If you want to perform any write actions on the returned instances you will have to set `@readonly = nil`.
 
 ```ruby
-writable_reified_items = snapshot.fetch_reified_items.transform_values do |array| 
-  array.map{|x| x.instance_variable_set("@readonly", false); x}
-end
+reified_parent, reified_children_hash = snapshot.fetch_reified_items
+
+reified_parent.instance_variable_set("@readonly", false)
 ```
 
 # Key Models Provided & Additional Customizations
