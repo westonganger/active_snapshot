@@ -14,23 +14,32 @@ module ActiveSnapshot
     validates :item_type, presence: true, uniqueness: { scope: [:snapshot_id, :item_id] }
 
     def object
-      yaml_method = "unsafe_load"
+      if ActiveSnapshot::Config.storage_method_yaml?
+        yaml_method = "unsafe_load"
 
-      if !YAML.respond_to?("unsafe_load")
-        yaml_method = "load"
+        if !YAML.respond_to?("unsafe_load")
+          yaml_method = "load"
+        end
+
+        @object ||= YAML.send(yaml_method, self[:object]).with_indifferent_access
+      elsif ActiveSnapshot::Config.storage_method_json?
+        @object ||= self[:object].with_indifferent_access
       end
-
-      @metadata ||= YAML.send(yaml_method, self[:object]).with_indifferent_access
     end
 
     def object=(h)
       @object = nil
-      self[:object] = YAML.dump(h)
+
+      if ActiveSnapshot::Config.storage_method_yaml?
+        self[:object] = YAML.dump(h)
+      elsif ActiveSnapshot::Config.storage_method_json?
+        self[:object] = JSON.parse(h.to_json)
+      end
     end
 
     def restore_item!
       ### Add any custom logic here
-      
+
       if !item
         item_klass = item_type.constantize
 

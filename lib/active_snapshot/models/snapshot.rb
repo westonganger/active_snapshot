@@ -16,23 +16,32 @@ module ActiveSnapshot
     validates :user_type, presence: true, if: :user_id
 
     def metadata
-      yaml_method = "unsafe_load"
+      if ActiveSnapshot::Config.storage_method_yaml?
+        yaml_method = "unsafe_load"
 
-      if !YAML.respond_to?("unsafe_load")
-        yaml_method = "load"
+        if !YAML.respond_to?("unsafe_load")
+          yaml_method = "load"
+        end
+
+        @metadata ||= YAML.send(yaml_method, self[:metadata]).with_indifferent_access
+      elsif ActiveSnapshot::Config.storage_method_json?
+        @metadata ||= self[:metadata]
       end
-
-      @metadata ||= YAML.send(yaml_method, self[:metadata]).with_indifferent_access
     end
 
     def metadata=(h)
       @metadata = nil
-      self[:metadata] = YAML.dump(h)
+
+      if ActiveSnapshot::Config.storage_method_yaml?
+        self[:metadata] = YAML.dump(h)
+      elsif ActiveSnapshot::Config.storage_method_json?
+        self[:metadata] = h
+      end
     end
 
     def build_snapshot_item(instance, child_group_name: nil)
       self.snapshot_items.new({
-        object: instance.attributes, 
+        object: instance.attributes,
         item_id: instance.id,
         item_type: instance.class.name,
         child_group_name: child_group_name,
@@ -86,7 +95,7 @@ module ActiveSnapshot
 
       reified_parent = nil
 
-      snapshot_items.each do |si| 
+      snapshot_items.each do |si|
         reified_item = si.item_type.constantize.new(si.object)
 
         reified_item.readonly!
