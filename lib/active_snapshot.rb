@@ -2,6 +2,7 @@ require "active_record"
 require "activerecord-import"
 
 require "active_snapshot/version"
+require "active_snapshot/config"
 
 require "active_snapshot/models/snapshot"
 require "active_snapshot/models/snapshot_item"
