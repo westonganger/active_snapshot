@@ -53,9 +53,9 @@ It defines an optional extension to your model: `has_snapshot_children`.
 
 It defines one instance method to your model: `create_snapshot!`
 
-# Using JSON columns too store encoded object
+# Using JSON columns to store encoded object
 
-ActiveSnapshot by default encodes objects to YAML and stores them id database as plain text. If you prefer to use JSON columns (such as PostgreSQL JSONB) add an initializer with following configuration:
+By default ActiveSnapshot encodes objects to YAML and stores them in database as plain text. If you prefer to use JSON columns (or similar such as JSONB) add an initializer with following configuration:
 
 ```ruby
 ActiveSnapshot::Config.setup do
