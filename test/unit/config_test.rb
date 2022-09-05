@@ -7,6 +7,10 @@ class ConfigTest < ActiveSupport::TestCase
         ActiveSnapshot::Config.setup
     end
 
+    def teardown
+        ActiveSnapshot::Config.storage_method = @configured_storage_method
+    end
+
     def test_defaults_to_yaml
         assert_equal ActiveSnapshot::Config.storage_method, 'yaml'
         assert_equal ActiveSnapshot::Config.storage_method_yaml?, true
@@ -53,10 +57,6 @@ class ConfigTest < ActiveSupport::TestCase
         
         assert_equal ActiveSnapshot::Config.storage_method, 'yaml'
         assert_equal ActiveSnapshot::Config.storage_method_yaml?, true
-    end
-
-    def teardown
-        ActiveSnapshot::Config.storage_method = @configured_storage_method
     end
 
     private
