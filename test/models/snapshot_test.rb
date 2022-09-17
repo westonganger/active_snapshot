@@ -45,7 +45,7 @@ class SnapshotTest < ActiveSupport::TestCase
       
     instance.valid?
 
-    [:item_id, :item_type, :identifier].each do |attr|
+    [:item_id, :item_type].each do |attr|
       assert instance.errors[attr].present? ### presence error
     end
 

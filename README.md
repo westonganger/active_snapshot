@@ -60,9 +60,9 @@ You now have access to the following methods:
 ```ruby
 post = Post.first
 
-# Create snapshot grouped by identifier, only :identifier argument is required, all others are optional
+# Create snapshot, all fields are optional
 snapshot = post.create_snapshot!(
-  identifier: "snapshot_1", # only required field
+  identifier: "snapshot_1",
   user: current_user,
   metadata: {
     foo: :bar
@@ -138,7 +138,7 @@ I strongly encourage you to read the code for this library to understand how it 
   * Defines `snapshots` and `snapshot_items` has_many associations
   * Defines `create_snapshot!` and `has_snapshot_children` methods
 - [Snapshot](./lib/active_snapshot/models/snapshot.rb)
-  * Contains a unique `identifier` column
+  * Contains a unique `identifier` column (optional, but available for custom identification purposes)
   * `has_many :item_snapshots`
 - [SnapshotItem](./lib/active_snapshot/models/snapshot_item.rb)
   * Contains `object` column with yaml encoded model instance `attributes`

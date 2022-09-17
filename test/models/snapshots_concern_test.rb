@@ -45,7 +45,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
     assert_not snapshot.new_record?
 
     assert_raise do
-      @post.create_snapshot!("foobar 3")
+      @post.create_snapshot!(identifier: "foobar 3")
     end
   end
 
@@ -129,6 +129,15 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
     end
 
     assert_equal call_count, 1
+  end
+
+  def test_optional_identifier
+    post = Post.first
+
+    assert_difference ->{ ActiveSnapshot::Snapshot.count }, 2 do
+      post.create_snapshot!
+      post.create_snapshot!
+    end
   end
 
 end
