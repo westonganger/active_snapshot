@@ -6,6 +6,10 @@ Bundler.require
 
 module Dummy
   class Application < Rails::Application
+    if Rails::VERSION::STRING.to_f >= 5.1
+      config.load_defaults Rails::VERSION::STRING.to_f
+    end
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -41,13 +45,6 @@ module Dummy
 
     config.after_initialize do
       ActiveRecord::Migration.migrate(Rails.root.join("db/migrate/*").to_s)
-    end
-
-    if ActiveRecord.respond_to?(:gem_version)
-      gem_version = ActiveRecord.gem_version
-      if gem_version.to_s.start_with?("5.2.")
-        config.active_record.sqlite3.represent_boolean_as_integer = true
-      end
     end
   end
 end
