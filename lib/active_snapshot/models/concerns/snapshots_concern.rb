@@ -8,7 +8,13 @@ module ActiveSnapshot
       has_many :snapshot_items, as: :item, class_name: 'ActiveSnapshot::SnapshotItem'
     end
 
-    def create_snapshot!(identifier, user: nil, metadata: nil)
+    def create_snapshot!(legacy_identifier=nil, identifier: nil, user: nil, metadata: nil)
+      if identifier.nil? && legacy_identifier
+        identifier = legacy_identifier
+
+        ActiveSupport::Deprecation.warn(LEGACY_POSITIONAL_ARGUMENT_WARNING)
+      end
+
       snapshot = snapshots.create!({
         identifier: identifier,
         user_id: (user.id if user),
@@ -118,6 +124,8 @@ module ActiveSnapshot
         return snapshot_children
       end
     end
+
+    LEGACY_POSITIONAL_ARGUMENT_WARNING = "Supplying the snapshots :identifier as a positional argument is now deprecated and will be removed in upcoming versions. Please supply the snapshot identifier using the :identifier keyword argument instead.".freeze
 
   end
 end

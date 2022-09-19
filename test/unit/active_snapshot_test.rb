@@ -24,7 +24,7 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
 
     assert_difference ->{ ActiveSnapshot::Snapshot.count }, 1 do
       assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, 2 do
-        @snapshot = parent.create_snapshot!(identifier)
+        @snapshot = parent.create_snapshot!(identifier: identifier)
       end
     end
 
@@ -53,4 +53,5 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
     assert_time_match original_parent_updated_at, parent.updated_at
     assert_time_match original_child_updated_at, parent.children_to_snapshot[:comments][:records].first.updated_at
   end
+
 end

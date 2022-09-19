@@ -62,7 +62,7 @@ post = Post.first
 
 # Create snapshot grouped by identifier, only :identifier argument is required, all others are optional
 snapshot = post.create_snapshot!(
-  "snapshot_1", # Required
+  identifier: "snapshot_1", # only required field
   user: current_user,
   metadata: {
     foo: :bar

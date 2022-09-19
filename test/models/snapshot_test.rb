@@ -110,7 +110,7 @@ class SnapshotTest < ActiveSupport::TestCase
     post = SubPost.create!(a: 1, b: 2)
     comment_content = 'Example comment'
     post.comments.create!(content: comment_content)
-    post.create_snapshot!('v1')
+    post.create_snapshot!(identifier: 'v1')
     snapshot = post.snapshots.first
     reified_items = snapshot.fetch_reified_items
 
@@ -124,7 +124,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     previous_attributes = instance.attributes
 
-    instance.create_snapshot!('v1')
+    instance.create_snapshot!(identifier: 'v1')
 
     instance.update!(a: 9, b: 9)
 
