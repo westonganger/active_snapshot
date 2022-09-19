@@ -12,7 +12,7 @@ module ActiveSnapshot
 
     validates :item_id, presence: true
     validates :item_type, presence: true
-    validates :identifier, presence: true, uniqueness: { scope: [:item_id, :item_type] }
+    validates :identifier, uniqueness: { scope: [:item_id, :item_type], allow_nil: true}
     validates :user_type, presence: true, if: :user_id
 
     def metadata

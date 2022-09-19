@@ -6,6 +6,8 @@ CHANGELOG
   * [PR #24](https://github.com/westonganger/active_snapshot/pull/24) - Fix arguments for db migration for mysql
   * [PR #29](https://github.com/westonganger/active_snapshot/pull/29) - Deprecate :identifier argument as a positional argument
     * Upgrading: Change all instances of `create_snapshot!("my-snapshot-1"` to `create_snapshot!(identifier: "my-snapshot-1"`
+  * [PR #30](https://github.com/westonganger/active_snapshot/pull/30) - Make snapshot identifier optional
+    * Upgrading: Create a migration with the following, `change_column_null :snapshots, :identifier, true`
 - **v0.2.4** - Feb 25, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.3...v0.2.4)
   * [PR #20](https://github.com/westonganger/active_snapshot/pull/20) - Resolve error when `has_snapshot_children` has not been defined as it should be optional
