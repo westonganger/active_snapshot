@@ -57,7 +57,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
     @snapshot_item = @snapshot.snapshot_items.first
 
-    assert @snapshot_item.object.is_a?(HashWithIndifferentAccess)
+    assert @snapshot_item.object.is_a?(Hash)
 
     @snapshot_item.object = {foo: :bar}
 

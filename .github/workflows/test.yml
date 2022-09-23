@@ -35,8 +35,19 @@ jobs:
             gemfile: gemfiles/rails_6.0.sqlite3.gemfile
           - ruby: 2.6
             gemfile: gemfiles/rails_6.1.sqlite3.gemfile
-          - ruby: "3.0"
+          - ruby: "3.1"
             gemfile: gemfiles/rails_7.0.sqlite3.gemfile
+
+          ### STORAGE METHOD TESTING
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_json"
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_yaml"
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "native_json"
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
@@ -82,8 +93,19 @@ jobs:
             gemfile: gemfiles/rails_6.0.mysql2.gemfile
           - ruby: 2.6
             gemfile: gemfiles/rails_6.1.mysql2.gemfile
-          - ruby: "3.0"
+          - ruby: "3.1"
             gemfile: gemfiles/rails_7.0.mysql2.gemfile
+
+          ### STORAGE METHOD TESTING
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_json"
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_yaml"
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "native_json"
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
@@ -131,8 +153,19 @@ jobs:
             gemfile: gemfiles/rails_6.0.pg.gemfile
           - ruby: 2.6
             gemfile: gemfiles/rails_6.1.pg.gemfile
-          - ruby: "3.0"
+          - ruby: "3.1"
             gemfile: gemfiles/rails_7.0.pg.gemfile
+
+          ### STORAGE METHOD TESTING
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_json"
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_yaml"
+          - ruby: 3.1
+            env:
+              ACTIVE_SNAPSHOT_STORAGE_METHOD: "native_json"
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"

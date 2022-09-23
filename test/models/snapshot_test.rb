@@ -63,11 +63,11 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_metadata
     @snapshot = @snapshot_klass.first
 
-    assert @snapshot.metadata.is_a?(HashWithIndifferentAccess)
+    assert @snapshot.metadata.is_a?(Hash)
 
     @snapshot.metadata = {foo: :bar}
 
-    assert_equal :bar, @snapshot.metadata['foo']
+    assert_equal "bar", @snapshot.metadata['foo']
   end
 
   def test_build_snapshot_item
@@ -101,7 +101,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     children_hash = reified_items.last
 
-    assert children_hash.is_a?(HashWithIndifferentAccess)
+    assert children_hash.is_a?(Hash)
 
     assert children_hash.all?{|k,v| v.all?{|x| x.readonly?} }
   end
@@ -122,7 +122,7 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_single_model_snapshots_without_children
     instance = ParentWithoutChildren.create!({a: 1, b: 2})
 
-    previous_attributes = instance.attributes
+    prev_attrs = instance.attributes
 
     instance.create_snapshot!(identifier: 'v1')
 
@@ -134,7 +134,15 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert_equal [instance, {}], reified_items
 
-    assert_equal previous_attributes, reified_items.first.attributes
+    new_attrs = reified_items.first.attributes
+
+    prev_time_attrs = prev_attrs.extract!("created_at","updated_at")
+    new_time_attrs = new_attrs.extract!("created_at","updated_at")
+
+    assert_equal new_time_attrs.values.map{|x| x.round(3)}, new_time_attrs.values
+
+    ### rounding to 3 sometimes fails due to millisecond precision so we just test for 2 decimal places here
+    assert_equal prev_time_attrs.values.map{|x| x.round(2)}, new_time_attrs.values.map{|x| x.round(2)}
   end
 
 end

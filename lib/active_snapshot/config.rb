@@ -1,29 +1,31 @@
-# frozen_string_literal: true
-
-class ActiveSnapshot::Config
-  class << self
+module ActiveSnapshot
+  class Config
     attr_reader :storage_method
-  end
 
-  def self.setup(&block)
-    self.storage_method = 'yaml'
-    instance_eval(&block) if block_given?
-  end
+    def initialize
+      @storage_method = 'serialized_json'
+    end
 
-  def self.storage_method=(value)
-    value_str = value.to_s
-    if ['yaml', 'json'].include?(value_str)
-      @storage_method = value_str
+    def storage_method=(value)
+      value_str = value.to_s
+
+      if ['serialized_yaml', 'serialized_json', 'native_json'].include?(value_str)
+        @storage_method = value_str
+      else
+        raise ArgumentError.new("Invalid storage_method provided")
+      end
+    end
+
+    def storage_method_yaml?
+      @storage_method == 'serialized_yaml'
+    end
+
+    def storage_method_json?
+      @storage_method == 'serialized_json'
+    end
+
+    def storage_method_native_json?
+      @storage_method == 'native_json'
     end
   end
-
-  def self.storage_method_yaml?
-    @storage_method == 'yaml'
-  end
-
-  def self.storage_method_json?
-    @storage_method == 'json'
-  end
 end
-
-ActiveSnapshot::Config.setup

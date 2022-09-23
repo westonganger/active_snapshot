@@ -5,11 +5,14 @@ CHANGELOG
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.4...master)
   * [PR #24](https://github.com/westonganger/active_snapshot/pull/24) - Fix arguments for db migration for mysql
   * [PR #29](https://github.com/westonganger/active_snapshot/pull/29) - Deprecate :identifier argument as a positional argument
-    * Upgrading: Change all instances of `create_snapshot!("my-snapshot-1"` to `create_snapshot!(identifier: "my-snapshot-1"`
   * [PR #30](https://github.com/westonganger/active_snapshot/pull/30) - Make snapshot identifier optional
-    * Upgrading: Create a migration with the following, `change_column_null :snapshots, :identifier, true`
-  * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - Add ability to change storage_method
-  * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - Change default storage method from `serialized_yaml` to `serialized_json`. If you are upgrading and have existing YAML data then please set `ActiveSnapshot.config.storage_method = "serialized_yaml"`
+  * [PR #32](https://github.com/westonganger/active_snapshot/pull/26) - Add configuration option `ActiveSnapshot.config.storage_method = 'serialized_json'` with support for `serialized_json`, `serialized_yaml`, `native_json`
+  * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - Change default storage method from `serialized_yaml` to `serialized_json`. 
+  * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - `snapshot.metadata` and `snapshot_item.object` no longer return a HashWithIndifferentAccess. Now they simply return a regular Hash.
+  * **Upgrade Instructions**
+    * Change all instances of `create_snapshot!("my-snapshot-1"` to `create_snapshot!(identifier: "my-snapshot-1"`
+    * Create a migration with the following `change_column_null :snapshots, :identifier, true` to remove the null constraint here
+    * If you have existing snapshots from a previous version then please set `ActiveSnapshot.config.storage_method = "serialized_yaml"`
 
 - **v0.2.4** - Feb 25, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.3...v0.2.4)

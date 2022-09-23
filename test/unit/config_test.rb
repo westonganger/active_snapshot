@@ -1,67 +1,66 @@
 require "test_helper"
 
-class ConfigTest < ActiveSupport::TestCase
-    
+class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
+
+  describe "storage_method" do
     def setup
-        @configured_storage_method = ActiveSnapshot::Config.storage_method
-        ActiveSnapshot::Config.setup
+      @orig_storage_method = ActiveSnapshot.config.storage_method
     end
 
     def teardown
-        ActiveSnapshot::Config.storage_method = @configured_storage_method
+      ActiveSnapshot.config.storage_method = @orig_storage_method
     end
 
-    def test_defaults_to_yaml
-        assert_equal ActiveSnapshot::Config.storage_method, 'yaml'
-        assert_equal ActiveSnapshot::Config.storage_method_yaml?, true
-        assert_equal ActiveSnapshot::Config.storage_method_json?, false
+    def test_defaults_to_serialized_json
+      assert_equal 'serialized_json', ActiveSnapshot.config.storage_method
+
+      assert_equal false, ActiveSnapshot.config.storage_method_yaml?
+      assert_equal true, ActiveSnapshot.config.storage_method_json?
+      assert_equal false, ActiveSnapshot.config.storage_method_native_json?
     end
 
-    def test_accepts_json_config_via_string
-        ActiveSnapshot::Config.storage_method = 'json'
+    def test_accepts_to_serialized_json
+      ActiveSnapshot.config.storage_method = 'serialized_json'
 
-        assert_equal ActiveSnapshot::Config.storage_method, 'json'
-        assert_equal ActiveSnapshot::Config.storage_method_json?, true
-        assert_equal ActiveSnapshot::Config.storage_method_yaml?, false
-    end
-    
-    def test_accepts_json_config_via_symbol
-        ActiveSnapshot::Config.storage_method = :json
+      assert_equal 'serialized_json', ActiveSnapshot.config.storage_method
 
-        assert_equal ActiveSnapshot::Config.storage_method, 'json'
-        assert_equal ActiveSnapshot::Config.storage_method_json?, true
-        assert_equal ActiveSnapshot::Config.storage_method_yaml?, false
+      assert_equal false, ActiveSnapshot.config.storage_method_yaml?
+      assert_equal true, ActiveSnapshot.config.storage_method_json?
+      assert_equal false, ActiveSnapshot.config.storage_method_native_json?
     end
 
-    def test_accepts_yaml_config_via_string
-        switch_storage_method_to_json
-        ActiveSnapshot::Config.storage_method = 'yaml'
 
-        assert_equal ActiveSnapshot::Config.storage_method, 'yaml'
-        assert_equal ActiveSnapshot::Config.storage_method_yaml?, true
-        assert_equal ActiveSnapshot::Config.storage_method_json?, false
+    def test_accepts_serialized_yaml
+      ActiveSnapshot.config.storage_method = 'serialized_yaml'
+
+      assert_equal 'serialized_yaml', ActiveSnapshot.config.storage_method
+
+      assert_equal true, ActiveSnapshot.config.storage_method_yaml?
+      assert_equal false, ActiveSnapshot.config.storage_method_json?
+      assert_equal false, ActiveSnapshot.config.storage_method_native_json?
     end
 
-    def test_accepts_yaml_config_via_symbol
-        switch_storage_method_to_json
-        ActiveSnapshot::Config.storage_method = :yaml
+    def test_accepts_native_json
+      ActiveSnapshot.config.storage_method = "native_json"
 
-        assert_equal ActiveSnapshot::Config.storage_method, 'yaml'
-        assert_equal ActiveSnapshot::Config.storage_method_yaml?, true
-        assert_equal ActiveSnapshot::Config.storage_method_json?, false
+      assert_equal "native_json", ActiveSnapshot.config.storage_method, "native_json"
+
+      assert_equal false, ActiveSnapshot.config.storage_method_yaml?
+      assert_equal false, ActiveSnapshot.config.storage_method_json?
+      assert_equal true, ActiveSnapshot.config.storage_method_native_json?
     end
 
     def test_config_doesnt_accept_not_specified_storage_methods
-        ActiveSnapshot::Config.storage_method = 'anything'
-        ActiveSnapshot::Config.storage_method = 'jsoon'
-        
-        assert_equal ActiveSnapshot::Config.storage_method, 'yaml'
-        assert_equal ActiveSnapshot::Config.storage_method_yaml?, true
+      assert_raise do
+        ActiveSnapshot.config.storage_method = 'foobar'
+      end
+      assert_equal "serialized_json", ActiveSnapshot.config.storage_method
     end
 
-    private
-
-    def switch_storage_method_to_json
-        ActiveSnapshot::Config.storage_method = 'json'
+    def test_converts_symbol_to_string
+      ActiveSnapshot.config.storage_method = "serialized_yaml"
+      assert_equal "serialized_yaml", ActiveSnapshot.config.storage_method
     end
+  end
+
 end
