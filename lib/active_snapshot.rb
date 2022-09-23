@@ -15,4 +15,14 @@ module ActiveSnapshot
   included do
     include ActiveSnapshot::SnapshotsConcern
   end
+
+  @@config = ActiveSnapshot::Config.new
+
+  def self.config(&block)
+    if block_given?
+      block.call(@@config)
+    else
+      return @@config
+    end
+  end
 end

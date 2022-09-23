@@ -16,25 +16,31 @@ module ActiveSnapshot
     validates :user_type, presence: true, if: :user_id
 
     def metadata
-      if ActiveSnapshot::Config.storage_method_yaml?
+      return @metadata if @metadata
+
+      if ActiveSnapshot.config.storage_method_json?
+        @metadata = JSON.parse(self[:metadata])
+      elsif ActiveSnapshot.config.storage_method_yaml?
         yaml_method = "unsafe_load"
 
         if !YAML.respond_to?("unsafe_load")
           yaml_method = "load"
         end
 
-        @metadata ||= YAML.send(yaml_method, self[:metadata]).with_indifferent_access
-      elsif ActiveSnapshot::Config.storage_method_json?
-        @metadata ||= self[:metadata]
+        @metadata = YAML.send(yaml_method, self[:metadata])
+      elsif ActiveSnapshot.config.storage_method_native_json?
+        @metadata = self[:metadata]
       end
     end
 
     def metadata=(h)
       @metadata = nil
 
-      if ActiveSnapshot::Config.storage_method_yaml?
+      if ActiveSnapshot.config.storage_method_json?
+        self[:metadata] = h.to_json
+      elsif ActiveSnapshot.config.storage_method_yaml?
         self[:metadata] = YAML.dump(h)
-      elsif ActiveSnapshot::Config.storage_method_json?
+      elsif ActiveSnapshot.config.storage_method_native_json?
         self[:metadata] = h
       end
     end

@@ -3,6 +3,10 @@ ENV["RAILS_ENV"] = "test"
 
 require "active_snapshot"
 
+if ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"].present?
+  ActiveSnapshot.config.storage_method = ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"]
+end
+
 begin
   require 'warning'
 
@@ -24,6 +28,8 @@ class ActiveSupport::TestCase
 end
 
 Rails.backtrace_cleaner.remove_silencers!
+
+require 'minitest-spec-rails' ### for describe blocks
 
 require 'minitest/reporters'
 Minitest::Reporters.use!(
