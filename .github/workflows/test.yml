@@ -26,17 +26,23 @@ jobs:
 
           ### RAILS VERSION TESTING
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.0.sqlite3.gemfile
+            env:
+              RAILS_VERSION: "5.0"
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.1.sqlite3.gemfile
+            env:
+              RAILS_VERSION: "5.1"
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.2.sqlite3.gemfile
+            env:
+              RAILS_VERSION: "5.2"
           - ruby: 2.6
-            gemfile: gemfiles/rails_6.0.sqlite3.gemfile
+            env:
+              RAILS_VERSION: "6.0"
           - ruby: 2.6
-            gemfile: gemfiles/rails_6.1.sqlite3.gemfile
+            env:
+              RAILS_VERSION: "6.1"
           - ruby: "3.1"
-            gemfile: gemfiles/rails_7.0.sqlite3.gemfile
+            env:
+              RAILS_VERSION: "7.0"
 
           ### STORAGE METHOD TESTING
           - ruby: 3.1
@@ -51,6 +57,7 @@ jobs:
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+      DB_GEM: "sqlite3"
 
     steps:
     - uses: actions/checkout@v3
@@ -84,17 +91,23 @@ jobs:
           ### RAILS VERSION TESTING
           ### DONT WORRY ABOUT TESTING ALL RUBY VERSIONS. THIS IS COVERED IN THE SQLITE3 TESTS
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.0.mysql2.gemfile
+            env:
+              RAILS_VERSION: "5.0"
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.1.mysql2.gemfile
+            env:
+              RAILS_VERSION: "5.1"
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.2.mysql2.gemfile
+            env:
+              RAILS_VERSION: "5.2"
           - ruby: 2.6
-            gemfile: gemfiles/rails_6.0.mysql2.gemfile
+            env:
+              RAILS_VERSION: "6.0"
           - ruby: 2.6
-            gemfile: gemfiles/rails_6.1.mysql2.gemfile
+            env:
+              RAILS_VERSION: "6.1"
           - ruby: "3.1"
-            gemfile: gemfiles/rails_7.0.mysql2.gemfile
+            env:
+              RAILS_VERSION: "7.0"
 
           ### STORAGE METHOD TESTING
           - ruby: 3.1
@@ -109,6 +122,8 @@ jobs:
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+      DB_GEM: "mysql2"
+
     steps:
     - uses: actions/checkout@v3
 
@@ -144,17 +159,23 @@ jobs:
           ### RAILS VERSION TESTING
           ### DONT WORRY ABOUT TESTING ALL RUBY VERSIONS. THIS IS COVERED IN THE SQLITE3 TESTS
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.0.pg.gemfile
+            env:
+              RAILS_VERSION: "5.0"
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.1.pg.gemfile
+            env:
+              RAILS_VERSION: "5.1"
           - ruby: 2.6
-            gemfile: gemfiles/rails_5.2.pg.gemfile
+            env:
+              RAILS_VERSION: "5.2"
           - ruby: 2.6
-            gemfile: gemfiles/rails_6.0.pg.gemfile
+            env:
+              RAILS_VERSION: "6.0"
           - ruby: 2.6
-            gemfile: gemfiles/rails_6.1.pg.gemfile
+            env:
+              RAILS_VERSION: "6.1"
           - ruby: "3.1"
-            gemfile: gemfiles/rails_7.0.pg.gemfile
+            env:
+              RAILS_VERSION: "7.0"
 
           ### STORAGE METHOD TESTING
           - ruby: 3.1
@@ -169,6 +190,7 @@ jobs:
 
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+      DB_GEM: "pg"
 
     steps:
     - uses: actions/checkout@v3

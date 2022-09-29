@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "minitest"
   s.add_development_dependency "minitest-reporters"
   s.add_development_dependency "minitest-spec-rails"
-  s.add_development_dependency 'appraisal'
   s.add_development_dependency "rspec-mocks"
 
   if RUBY_VERSION.to_f >= 2.4
