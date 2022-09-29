@@ -42,17 +42,13 @@ jobs:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
-
-    - name: Bundle
-      run: |
-        gem install bundler
-        bundle install
+        bundler-cache: true
 
     - name: Run tests
       run: |
@@ -92,17 +88,13 @@ jobs:
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
-
-    - name: Bundle
-      run: |
-        gem install bundler
-        bundle install
+        bundler-cache: true
 
     - name: Run tests
       env:
@@ -146,17 +138,13 @@ jobs:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: "${{ matrix.ruby }}"
-
-    - name: Bundle
-      run: |
-        gem install bundler
-        bundle install
+        bundler-cache: true
 
     - name: Run tests
       env:
