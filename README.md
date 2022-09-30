@@ -65,14 +65,12 @@ ActiveSnapshot.config do |config|
 end
 ```
 
-If using native json, you must configure the above before generating the migration, otherwise you may need to create a migration to change the `:object` and `:metadata` columns to json (or jsonb)
+If using a native json column, you should configure the `storage_method` before generating the migration. If this step was missed then you would need to create a migration to change the `:object` and `:metadata` columns to json (or jsonb)
 
 ```ruby
 change_column :snapshots, :object, :json
 change_column :snapshots, :metadata, :json
 ```
-
-and in generated migration change `snapshots.metadata` and `snapshot_items.object` column types to `jsonb`.
 
 # Basic Usage
 
@@ -162,7 +160,7 @@ I strongly encourage you to read the code for this library to understand how it 
   * Contains a unique `identifier` column (optional, but available for custom identification purposes)
   * `has_many :item_snapshots`
 - [SnapshotItem](./lib/active_snapshot/models/snapshot_item.rb)
-  * Contains `object` column with yaml encoded model instance `attributes`
+  * Contains `object` column which contains an encoded database row
   * `belongs_to :snapshot`
 
 
