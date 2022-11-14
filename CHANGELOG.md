@@ -1,8 +1,12 @@
 CHANGELOG
 ---------
 
-- **UNRELEASED**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.4...master)
+- **Unreleased**
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.0...master)
+  - Nothing yet
+
+- **v0.3.0** - November 14, 2022
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.4...v0.3.0)
   * [PR #24](https://github.com/westonganger/active_snapshot/pull/24) - Fix arguments for db migration for mysql
   * [PR #29](https://github.com/westonganger/active_snapshot/pull/29) - Deprecate :identifier argument as a positional argument
   * [PR #30](https://github.com/westonganger/active_snapshot/pull/30) - Make snapshot identifier optional
