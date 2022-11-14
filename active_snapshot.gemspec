@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.metadata["changelog_uri"] = File.join(s.homepage, "blob/master/CHANGELOG.md")
 
   s.files = Dir.glob("{lib/**/*}") + %w{ LICENSE README.md Rakefile CHANGELOG.md }
-  s.test_files  = Dir.glob("{test/**/*}")
   s.require_path = 'lib'
 
   s.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
