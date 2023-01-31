@@ -121,7 +121,8 @@ class Post < ActiveRecord::Base
       
       ip_address: {
         record: instance.ip_address,
-        delete_method: ->(item){ item.release! }
+        delete_method: ->(item){ item.release! },
+        restore_first: true  # Restore first in case we are using foreign key
       }
     }
   end

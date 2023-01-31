@@ -51,7 +51,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
 
   def test_has_snapshot_children
     klass = VolatilePost
-    
+
     assert_nil klass.has_snapshot_children
 
     klass.has_snapshot_children do
@@ -72,6 +72,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
       [:foobar, 123],
       {foo: :bar},
       {foo: {records: 'bar', delete_method: 'bar'}},
+      {foo: {records: 'bar', restore_first: 'bar'}},
     ]
 
     invalid.each do |x|
@@ -98,6 +99,8 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
       {foo: {records: [], delete_method: proc{} }},
       {foo: nil},
       {foo: {records: nil}},
+      {foo: {records: nil, restore_first: true}},
+      {foo: {records: nil, restore_first: false}},
     ]
 
     valid.each do |x|
@@ -113,6 +116,24 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
     end
 
     assert klass.new.children_to_snapshot.count == 2
+  end
+
+  def test_restore_first
+    @note = Note.create!(body: 'foobar', post: Post.first)
+
+    Note.has_snapshot_children do
+      {post: {record: post}}
+    end
+    snapshot = @note.create_snapshot!(identifier: 'snapshot_1')
+
+    assert_equal snapshot.snapshot_items.first.item_type, 'Note'
+
+    Note.has_snapshot_children do
+      {post: {record: post, restore_first: true}}
+    end
+    snapshot = @note.create_snapshot!(identifier: 'snapshot_2')
+
+    assert_equal snapshot.snapshot_items.first.item_type, 'Post'
   end
 
   def test_legacy_positional_identifier_argument

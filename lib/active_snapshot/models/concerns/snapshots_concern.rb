@@ -23,6 +23,7 @@ module ActiveSnapshot
       })
 
       snapshot_items = []
+      restore_first_items = []
 
       snapshot_items << snapshot.build_snapshot_item(self)
 
@@ -31,10 +32,13 @@ module ActiveSnapshot
       if snapshot_children
         snapshot_children.each do |child_group_name, h|
           h[:records].each do |child_item|
-            snapshot_items << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name)
+            (h[:restore_first] ? restore_first_items : snapshot_items) << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name)
           end
         end
       end
+
+      ### Prepend restore_first items to account for potential foreign keys
+      snapshot_items.unshift(*restore_first_items)
 
       SnapshotItem.import(snapshot_items, validate: true)
 
@@ -116,6 +120,15 @@ module ActiveSnapshot
               end
             end
 
+            restore_first = opts[:restore_first]
+
+            if restore_first.present?
+              if [true, false].include? restore_first
+                snapshot_children[assoc_name][:restore_first] = restore_first
+              else
+                raise ArgumentError.new("Invalid `has_snapshot_children` definition. Invalid :restore_first argument. Must be a Boolean.")
+              end
+            end
           else
             raise ArgumentError.new("Invalid `has_snapshot_children` definition. Invalid :records argument. Must be a Hash or Array")
           end
