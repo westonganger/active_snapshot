@@ -1,28 +1,32 @@
-require "active_record"
-require "activerecord-import"
+require 'active_support/lazy_load_hooks'
 
 require "active_snapshot/version"
-require "active_snapshot/config"
 
-require "active_snapshot/models/snapshot"
-require "active_snapshot/models/snapshot_item"
+ActiveSupport.on_load(:active_record) do
+  require "activerecord-import"
 
-require "active_snapshot/models/concerns/snapshots_concern"
+  require "active_snapshot/config"
 
-module ActiveSnapshot
-  extend ActiveSupport::Concern
+  require "active_snapshot/models/snapshot"
+  require "active_snapshot/models/snapshot_item"
 
-  included do
-    include ActiveSnapshot::SnapshotsConcern
-  end
+  require "active_snapshot/models/concerns/snapshots_concern"
 
-  @@config = ActiveSnapshot::Config.new
+  module ActiveSnapshot
+    extend ActiveSupport::Concern
 
-  def self.config(&block)
-    if block_given?
-      block.call(@@config)
-    else
-      return @@config
+    included do
+      include ActiveSnapshot::SnapshotsConcern
+    end
+
+    @@config = ActiveSnapshot::Config.new
+
+    def self.config(&block)
+      if block_given?
+        block.call(@@config)
+      else
+        return @@config
+      end
     end
   end
 end
