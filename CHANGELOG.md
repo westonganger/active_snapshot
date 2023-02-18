@@ -3,7 +3,8 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.0...master)
-  - Add `optional: true` to the Snapshot `belongs_to :user` relationship. Also added ActiveRecord model-level config option `belongs_to_required_by_default` to ensure belongs_to validations are enforced because Rails was ignoring the application config for `config.active_record.belongs_to_required_by_default`
+  * Allow ActiveRecord to be lazy loaded using `ActiveSupport.on_load`
+  * Add `optional: true` to the Snapshot `belongs_to :user` relationship. Also added ActiveRecord model-level config option `belongs_to_required_by_default` to ensure belongs_to validations are enforced because Rails was ignoring the application config for `config.active_record.belongs_to_required_by_default`
 
 - **v0.3.0** - November 14, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.4...v0.3.0)
