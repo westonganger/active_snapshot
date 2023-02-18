@@ -1,6 +1,8 @@
 #$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 ENV["RAILS_ENV"] = "test"
 
+require "active_support/all"
+
 require "active_snapshot"
 
 if ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"].present?
