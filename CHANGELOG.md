@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.0...master)
-  - Nothing yet
+  - Add `optional: true` to the Snapshot `belongs_to :user` relationship. Also added ActiveRecord model-level config option `belongs_to_required_by_default` to ensure belongs_to validations are enforced because Rails was ignoring the application config for `config.active_record.belongs_to_required_by_default`
 
 - **v0.3.0** - November 14, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.4...v0.3.0)
@@ -11,7 +11,7 @@ CHANGELOG
   * [PR #29](https://github.com/westonganger/active_snapshot/pull/29) - Deprecate :identifier argument as a positional argument
   * [PR #30](https://github.com/westonganger/active_snapshot/pull/30) - Make snapshot identifier optional
   * [PR #32](https://github.com/westonganger/active_snapshot/pull/26) - Add configuration option `ActiveSnapshot.config.storage_method = 'serialized_json'` with support for `serialized_json`, `serialized_yaml`, `native_json`
-  * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - Change default storage method from `serialized_yaml` to `serialized_json`. 
+  * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - Change default storage method from `serialized_yaml` to `serialized_json`.
   * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - `snapshot.metadata` and `snapshot_item.object` no longer return a HashWithIndifferentAccess. Now they simply return a regular Hash.
   * **Upgrade Instructions**
     * Change all instances of `create_snapshot!("my-snapshot-1"` to `create_snapshot!(identifier: "my-snapshot-1"`
@@ -46,7 +46,7 @@ CHANGELOG
   * Fix test suite
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.1.0...v0.1.1)
   * Nothing yet
-  
+
 - **v0.1.0** - Mar 5, 2021
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/edbbfd3...v0.1.0)
   * Gem Initial Release

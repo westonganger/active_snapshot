@@ -30,11 +30,11 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
   def test_validations
     instance = @snapshot_item_klass.new
-      
+
     instance.valid?
 
     [:item_id, :item_type, :snapshot_id].each do |attr|
-      assert instance.errors[attr].present? ### presence error
+      assert_equal ["can't be blank"], instance.errors[attr] ### presence error
     end
 
     shared_post = DATA[:shared_post]
@@ -42,14 +42,10 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
     instance = @snapshot_item_klass.new(item: snapshot.item, snapshot: snapshot)
 
-    instance.valid?
+    assert_not instance.valid?
 
-    assert instance.errors[:item_id].present? ### uniq error
-    assert instance.errors[:item_type].present? ### uniq error
-
-    instance = @snapshot_item_klass.new(item_id: 1, item_type: 'Foobar', snapshot: snapshot)
-
-    assert instance.valid?
+    assert_equal ["has already been taken"], instance.errors[:item_id] ### uniq error
+    assert_equal ["has already been taken"], instance.errors[:item_type] ### uniq error
   end
 
   def test_object
