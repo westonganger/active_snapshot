@@ -2,11 +2,13 @@ module ActiveSnapshot
   class Snapshot < ActiveRecord::Base
     self.table_name = "snapshots"
 
+    self.belongs_to_required_by_default = true ### global config option not working, https://github.com/rails/rails/issues/27844
+
     if defined?(ProtectedAttributes)
       attr_accessible :item_id, :item_type, :identifier, :user_id, :user_type
     end
 
-    belongs_to :user, polymorphic: true
+    belongs_to :user, polymorphic: true, optional: true
     belongs_to :item, polymorphic: true
     has_many :snapshot_items, class_name: 'ActiveSnapshot::SnapshotItem', dependent: :destroy
 
