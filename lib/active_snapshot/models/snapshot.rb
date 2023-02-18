@@ -54,7 +54,7 @@ module ActiveSnapshot
       })
     end
 
-    def restore!
+    def restore!(order_by_definition: false)
       ActiveRecord::Base.transaction do
         ### Cache the child snapshots in a variable for re-use
         cached_snapshot_items = snapshot_items.includes(:item)
@@ -85,6 +85,30 @@ module ActiveSnapshot
               end
             end
           end
+        end
+
+        if !order_by_definition
+          # Restores in whatever the order the records were saved in
+        else
+          sorted_snapshot_items = []
+
+          item.has_snapshot_children.each do |assoc_name, h|
+            assoc = item.class.reflect_on_association(assoc_name)
+
+            if assoc.polymorphic?
+              ### Cannot determine ordering, will be done last then
+            else
+              assoc_class_name = assoc.computed_type.name
+
+              assoc_snapshot_items, cached_snapshot_items = cached_snapshot_items.partition{|x| x.item_type == assoc_class_name }
+
+              sorted_snapshot_items += assoc_snapshot_items
+            end
+          end
+
+          sorted_snapshot_items += cached_snapshot_items ### Add remaining items missed by polymorphic
+
+          cached_snapshot_items = sort_snapshot_items
         end
 
         ### Create or Update Items from Snapshot Items
