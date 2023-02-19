@@ -3,8 +3,9 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.0...master)
-  * Allow ActiveRecord to be lazy loaded using `ActiveSupport.on_load`
-  * Add `optional: true` to the Snapshot `belongs_to :user` relationship
+  * [#36](https://github.com/westonganger/active_snapshot/pull/36) - Allow ActiveRecord to be lazy loaded using `ActiveSupport.on_load`
+  * [#35](https://github.com/westonganger/active_snapshot/pull/35) - Add `optional: true` to the Snapshot `belongs_to :user` relationship
+  * [#39](https://github.com/westonganger/active_snapshot/pull/39) - Remove redundant validation on SnapshotItem for item_type
 
 - **v0.3.0** - November 14, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.4...v0.3.0)
