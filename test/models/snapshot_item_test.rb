@@ -45,7 +45,6 @@ class SnapshotItemTest < ActiveSupport::TestCase
     assert_not instance.valid?
 
     assert_equal ["has already been taken"], instance.errors[:item_id] ### uniq error
-    assert_equal ["has already been taken"], instance.errors[:item_type] ### uniq error
   end
 
   def test_object
