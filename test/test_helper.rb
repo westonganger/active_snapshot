@@ -3,6 +3,12 @@ ENV["RAILS_ENV"] = "test"
 
 require "active_support/all"
 
+ActiveSupport.on_load(:active_record) do
+  ### To ensure belongs_to :optional validation errors are being caught properly, otherwise they are ignored for some reason
+  ### https://github.com/rails/rails/issues/23589#issuecomment-323761201
+  ActiveRecord::Base.belongs_to_required_by_default = true
+end
+
 require "active_snapshot"
 
 if ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"].present?
