@@ -2,8 +2,6 @@ module ActiveSnapshot
   class SnapshotItem < ActiveRecord::Base
     self.table_name = "snapshot_items"
 
-    self.belongs_to_required_by_default = true ### global config option not working, https://github.com/rails/rails/issues/27844
-
     if defined?(ProtectedAttributes)
       attr_accessible :object, :item_id, :item_type, :child_group_name
     end
