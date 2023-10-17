@@ -2,7 +2,11 @@ CHANGELOG
 ---------
 
 - **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.1...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.2...master)
+  * Nothing yet
+
+- **v0.3.2** - Oct 17, 2023
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.1...v0.3.2)
   * [#43](https://github.com/westonganger/active_snapshot/pull/43) - Fix unique index error in generated DB migration
 
 - **v0.3.1** - August 4, 2023
