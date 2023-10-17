@@ -17,8 +17,6 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("{lib/**/*}") + %w{ LICENSE README.md Rakefile CHANGELOG.md }
   s.require_path = 'lib'
 
-  s.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
-
   s.add_runtime_dependency "activerecord"
   s.add_runtime_dependency "railties"
   s.add_runtime_dependency "activerecord-import"
@@ -32,5 +30,4 @@ Gem::Specification.new do |s|
   if RUBY_VERSION.to_f >= 2.4
     s.add_development_dependency "warning"
   end
-
 end

@@ -25,6 +25,12 @@ rescue LoadError
   # Do nothing
 end
 
+### Delete the database completely before starting
+FileUtils.rm(
+  File.expand_path("../dummy_app/db/*sqlite*",  __FILE__),
+  force: true,
+)
+
 ### Instantiates Rails
 require File.expand_path("../dummy_app/config/environment.rb",  __FILE__)
 
@@ -75,24 +81,9 @@ module MinitestRSpecMocksIntegration
 end
 Minitest::Test.send(:include, MinitestRSpecMocksIntegration)
 
-klasses = [
-  Post,
-  ActiveSnapshot::Snapshot,
-  ActiveSnapshot::SnapshotItem,
-]
-
-klasses.each do |klass|
-  if klass.connection.adapter_name.downcase.include?("sqlite")
-    ActiveRecord::Base.connection.execute("DELETE FROM #{klass.table_name};")
-    ActiveRecord::Base.connection.execute("UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = '#{klass.table_name}';")
-  else
-    ActiveRecord::Base.connection.execute("TRUNCATE TABLE #{klass.table_name}")
-  end
-end
-
 DATA = {}.with_indifferent_access
 
-DATA[:shared_post] = Post.find_or_create_by!(a: 1, b: 3)
+DATA[:shared_post] = Post.create!(a: 1, b: 3)
 DATA[:shared_post].create_snapshot!(identifier: 'v1')
 DATA[:shared_post].update_columns(a: 2, b: 4)
 DATA[:shared_post].create_snapshot!(identifier: 'v2')
