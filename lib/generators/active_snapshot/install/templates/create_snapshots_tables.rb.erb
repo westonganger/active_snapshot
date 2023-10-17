@@ -15,7 +15,8 @@ class <%= migration_name %> < ActiveRecord::Migration::Current
 
     create_table :snapshot_items<%= table_options %> do |t|
       t.belongs_to :snapshot, null: false, index: true
-      t.belongs_to :item, polymorphic: true, null: false, unique: [:snapshot_id], index: true
+      t.belongs_to :item, polymorphic: true, null: false, index: true
+      t.index [:snapshot_id, :item_id, :item_type], unique: true
 
       t.<%= ActiveSnapshot.config.storage_method == 'native_json' ? 'json' : 'text' %> :object, null: false
 
