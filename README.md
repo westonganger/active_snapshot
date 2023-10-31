@@ -1,7 +1,7 @@
 # ActiveSnapshot
 
 <a href="https://badge.fury.io/rb/active_snapshot" target="_blank"><img height="21" style='border:0px;height:21px;' border='0' src="https://badge.fury.io/rb/active_snapshot.svg" alt="Gem Version"></a>
-<a href='https://github.com/westonganger/active_snapshot/actions' target='_blank'><img src="https://github.com/westonganger/active_snapshot/workflows/Tests/badge.svg" style="max-width:100%;" height='21' style='border:0px;height:21px;' border='0' alt="CI Status"></a>
+<a href='https://github.com/westonganger/active_snapshot/actions' target='_blank'><img src="https://github.com/westonganger/active_snapshot/actions/workflows/test.yml/badge.svg?branch=master" style="max-width:100%;" height='21' style='border:0px;height:21px;' border='0' alt="CI Status"></a>
 <a href='https://rubygems.org/gems/active_snapshot' target='_blank'><img height='21' style='border:0px;height:21px;' src='https://img.shields.io/gem/dt/active_snapshot?color=brightgreen&label=Rubygems%20Downloads' border='0' alt='RubyGems Downloads' /></a>
 
 Simplified snapshots and restoration for ActiveRecord models and associations with a transparent white-box implementation.
@@ -101,24 +101,24 @@ snapshot.destroy!
 ```ruby
 class Post < ActiveRecord::Base
   include ActiveSnapshot
-  
+
   has_snapshot_children do
     ### Executed in the context of the instance / self
 
     ### Reload record from database to ensure a clean state and eager load the specified associations
     instance = self.class.includes(:tags, :ip_address, comments: [:comment_sub_records]).find(id)
-    
+
     ### Define the associated records that will be restored
     {
       comments: instance.comments,
-      
+
       ### Nested Associations can be handled by simply mapping them into an array
-      comment_sub_records: instance.comments.flat_map{|x| x.comment_sub_records }, 
-      
+      comment_sub_records: instance.comments.flat_map{|x| x.comment_sub_records },
+
       tags: {
         records: instance.tags
       },
-      
+
       ip_address: {
         record: instance.ip_address,
         delete_method: ->(item){ item.release! }
@@ -133,7 +133,7 @@ Now when you run `create_snapshot!` the associations will be tracked accordingly
 
 # Reifying Snapshot Items
 
-You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data. 
+You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data.
 
 ```ruby
 reified_parent, reified_children_hash = snapshot.fetch_reified_items
