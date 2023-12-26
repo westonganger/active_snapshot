@@ -22,6 +22,7 @@ jobs:
           - ruby: "3.0"
           - ruby: "3.1"
           - ruby: "3.2"
+          - ruby: "3.3"
           ### TEST RAILS VERSIONS
           - ruby: "2.6"
             env:
@@ -32,46 +33,46 @@ jobs:
           - ruby: "2.6"
             env:
               RAILS_VERSION: "6.1"
-          - ruby: "3.2"
+          - ruby: "3.3"
             env:
               RAILS_VERSION: "7.0"
-          - ruby: "3.2"
+          - ruby: "3.3"
             env:
               RAILS_VERSION: "7.1"
           ### STORAGE METHOD TESTING
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "sqlite3"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_json"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "sqlite3"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_yaml"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "sqlite3"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "native_json"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "mysql2"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_json"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "mysql2"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_yaml"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "mysql2"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "native_json"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "pg"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_json"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "pg"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "serialized_yaml"
-          - ruby: 3.2
+          - ruby: 3.3
             db_gem: "pg"
             env:
               ACTIVE_SNAPSHOT_STORAGE_METHOD: "native_json"
