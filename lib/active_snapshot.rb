@@ -4,8 +4,6 @@ require "active_snapshot/config"
 require 'active_support/lazy_load_hooks'
 
 ActiveSupport.on_load(:active_record) do
-  require "activerecord-import"
-
   require "active_snapshot/models/snapshot"
   require "active_snapshot/models/snapshot_item"
 

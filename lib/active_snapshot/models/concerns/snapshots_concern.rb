@@ -22,21 +22,23 @@ module ActiveSnapshot
         metadata: (metadata || {}),
       })
 
-      snapshot_items = []
+      new_entries = []
 
-      snapshot_items << snapshot.build_snapshot_item(self)
+      current_time = Time.now
+
+      new_entries << snapshot.build_snapshot_item(self).attributes.merge(created_at: current_time)
 
       snapshot_children = self.children_to_snapshot
 
       if snapshot_children
         snapshot_children.each do |child_group_name, h|
           h[:records].each do |child_item|
-            snapshot_items << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name)
+            new_entries << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name).attributes.merge(created_at: current_time)
           end
         end
       end
 
-      SnapshotItem.import(snapshot_items, validate: true)
+      SnapshotItem.upsert_all(new_entries.map{|x| x.delete("id"); x }, returning: false)
 
       snapshot
     end

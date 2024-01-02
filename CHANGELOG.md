@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.2...master)
-  * Nothing yet
+  * [#44](https://github.com/westonganger/active_snapshot/pull/44) - Remove dependency on activerecord-import with vanilla ActiveRecord upsert_all
 
 - **v0.3.2** - Oct 17, 2023
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.1...v0.3.2)
