@@ -26,9 +26,6 @@ jobs:
           ### TEST RAILS VERSIONS
           - ruby: "2.6"
             env:
-              RAILS_VERSION: "5.2"
-          - ruby: "2.6"
-            env:
               RAILS_VERSION: "6.0"
           - ruby: "2.6"
             env:

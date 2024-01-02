@@ -15,15 +15,11 @@ if ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"].present?
   ActiveSnapshot.config.storage_method = ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"]
 end
 
-begin
-  require 'warning'
+require 'warning'
 
-  Warning.ignore(
-    %r{mail/parsers/address_lists_parser}, ### Hide mail gem warnings
-  )
-rescue LoadError
-  # Do nothing
-end
+Warning.ignore(
+  %r{mail/parsers/address_lists_parser}, ### Hide mail gem warnings
+)
 
 ### Delete the database completely before starting
 FileUtils.rm(
