@@ -51,12 +51,10 @@ Minitest::Reporters.use!(
 require "minitest/autorun"
 
 # Run any available migration
-if ActiveRecord.gem_version >= Gem::Version.new("6.0")
+if ActiveRecord::VERSION::MAJOR == 6
   ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __dir__), ActiveRecord::SchemaMigration).migrate
-elsif ActiveRecord.gem_version >= Gem::Version.new("5.2")
-  ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __dir__)).migrate
 else
-  ActiveRecord::Migrator.migrate File.expand_path("dummy_app/db/migrate/", __dir__)
+  ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __dir__)).migrate
 end
 
 require 'rspec/mocks'

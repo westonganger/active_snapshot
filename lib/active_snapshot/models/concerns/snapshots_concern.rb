@@ -12,7 +12,11 @@ module ActiveSnapshot
       if identifier.nil? && legacy_identifier
         identifier = legacy_identifier
 
-        ActiveSupport::Deprecation.warn(LEGACY_POSITIONAL_ARGUMENT_WARNING)
+        if ActiveSupport.version >= Gem::Version.new("7.1")
+          ActiveSupport::Deprecation.new.warn(LEGACY_POSITIONAL_ARGUMENT_WARNING)
+        else
+          ActiveSupport::Deprecation.warn(LEGACY_POSITIONAL_ARGUMENT_WARNING)
+        end
       end
 
       snapshot = snapshots.create!({

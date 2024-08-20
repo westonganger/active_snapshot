@@ -15,6 +15,5 @@ Gemfile.lock
 /tmp/
 /test/**/tmp/
 
-test/dummy_app/**/*.sqlite3.db
-test/dummy_app/**/*.sqlite3
+test/dummy_app/**/*.sqlite*
 test/dummy_app/**/*.log
