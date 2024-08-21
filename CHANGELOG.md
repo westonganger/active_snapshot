@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.4.0...master)
-  * Nothing yet
+  * [#xx]((https://github.com/westonganger/active_snapshot/pull/xx) Remove :identifier argument as a positional argument
 
 - **v0.4.0** - July 23, 2024
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.2...v0.4.0)
