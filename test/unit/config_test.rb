@@ -12,6 +12,10 @@ class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
     end
 
     def test_defaults_to_serialized_json
+      if ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"].present?
+        skip
+      end
+
       assert_equal 'serialized_json', ActiveSnapshot.config.storage_method
 
       assert_equal false, ActiveSnapshot.config.storage_method_yaml?
@@ -51,10 +55,11 @@ class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
     end
 
     def test_config_doesnt_accept_not_specified_storage_methods
+      assert ActiveSnapshot.config.storage_method.present?
       assert_raise do
-        ActiveSnapshot.config.storage_method = 'foobar'
+        ActiveSnapshot.config.storage_method = "foobar"
       end
-      assert_equal "serialized_json", ActiveSnapshot.config.storage_method
+      refute_equal "foobar", ActiveSnapshot.config.storage_method
     end
 
     def test_converts_symbol_to_string

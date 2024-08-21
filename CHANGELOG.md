@@ -3,7 +3,8 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.4.0...master)
-  * [#xx]((https://github.com/westonganger/active_snapshot/pull/xx) Remove :identifier argument as a positional argument
+  * [#53](https://github.com/westonganger/active_snapshot/pull/53) - Allow `ActiveSnapshot.config` to be called before ActiveRecord on_load hook has occurred
+  * [#52]((https://github.com/westonganger/active_snapshot/pull/52) Remove :identifier argument as a positional argument
 
 - **v0.4.0** - July 23, 2024
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.3.2...v0.4.0)
