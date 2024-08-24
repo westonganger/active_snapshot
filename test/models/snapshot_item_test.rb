@@ -20,12 +20,23 @@ class SnapshotItemTest < ActiveSupport::TestCase
       instance.snapshot = instance
     end
 
-    instance.snapshot = ActiveSnapshot::Snapshot.new
+    instance.snapshot = @snapshot_klass.new
 
     instance.item = instance
 
     assert_not instance.snapshot.nil?
     assert_not instance.item.nil?
+  end
+
+  def test_object_validation
+    %w[serialized_yaml native_json serialized_json].each do |storage_strategy|
+      ActiveSnapshot.config.storage_method = storage_strategy
+      instance = @snapshot_item_klass.new
+
+      assert instance.invalid?
+
+      assert_equal ["can't be blank"], instance.errors[:object]
+    end
   end
 
   def test_validations
