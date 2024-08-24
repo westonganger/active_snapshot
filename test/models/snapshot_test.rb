@@ -94,7 +94,7 @@ class SnapshotTest < ActiveSupport::TestCase
     @snapshot.restore!
   end
 
-  def test_fetch_reified_items
+  def test_fetch_reified_items_with_readonly
     @snapshot = @snapshot_klass.first
 
     reified_items = @snapshot.fetch_reified_items
@@ -107,7 +107,23 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert children_hash.is_a?(Hash)
 
-    assert children_hash.all?{|k,v| v.all?{|x| x.readonly?} }
+    assert children_hash.all? { |_k, v| v.all? { |x| x.readonly? } }
+  end
+
+  def test_fetch_reified_items_without_readonly
+    @snapshot = @snapshot_klass.first
+
+    reified_items = @snapshot.fetch_reified_items(readonly: false)
+
+    assert reified_items.is_a?(Array)
+
+    assert_not reified_items.first.readonly?
+
+    children_hash = reified_items.last
+
+    assert children_hash.is_a?(Hash)
+
+    assert children_hash.all? { |_k, v| v.all? { |x| x.readonly? } }
   end
 
   def test_fetch_reified_items_with_sti_class

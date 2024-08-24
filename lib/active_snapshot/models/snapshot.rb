@@ -96,7 +96,7 @@ module ActiveSnapshot
       return true
     end
 
-    def fetch_reified_items
+    def fetch_reified_items(readonly: true)
       reified_children_hash = {}.with_indifferent_access
 
       reified_parent = nil
@@ -104,7 +104,7 @@ module ActiveSnapshot
       snapshot_items.each do |si|
         reified_item = si.item_type.constantize.new(si.object)
 
-        reified_item.readonly!
+        reified_item.readonly! if readonly
 
         key = si.child_group_name
 
