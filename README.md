@@ -9,15 +9,15 @@ Simplified snapshots and restoration for ActiveRecord models and associations wi
 Key Features:
 
 - Create and Restore snapshots of a parent record and any specified child records
-- Predictible and explicit behaviour provides much needed clarity to your restore logic
+- Predictable and explicit behaviour provides much needed clarity to your restore logic
 - Snapshots are created upon request only, we do not use any callbacks
 - Tiny method footprint so its easy to completely override the logic later
 
 Why This Library:
 
-Model Versioning and Restoration require concious thought, design, and understanding. You should understand your versioning and restoration process completely. This gem's small API and fully understandable design fully supports this.
+Model Versioning and Restoration require conscious thought, design, and understanding. You should understand your versioning and restoration process completely. This gem's small API and fully understandable design fully supports this.
 
-I do not recommend using paper_trail-association_tracking because it is mostly a blackbox solution which encourages you to set it up and then assume its Just Working<sup>TM</sup>. This makes for major data problems later. Dont fall into this trap. Instead read this gems brief source code completely before use OR copy the code straight into your codebase. Once you know it, then you are free.
+I do not recommend using [paper_trail-association_tracking](https://github.com/westonganger/paper_trail-association_tracking) because it is mostly a blackbox solution which encourages you to set it up and then assume its Just Working<sup>TM</sup>. This makes for major data problems later. Dont fall into this trap. Instead read this gems brief source code completely before use OR copy the code straight into your codebase. Once you know it, then you are free.
 
 
 
