@@ -56,7 +56,7 @@ class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
 
     def test_config_doesnt_accept_not_specified_storage_methods
       assert ActiveSnapshot.config.storage_method.present?
-      assert_raise do
+      assert_raises ActiveSnapshot::Config::InvalidStorageMethodError do
         ActiveSnapshot.config.storage_method = "foobar"
       end
       refute_equal "foobar", ActiveSnapshot.config.storage_method
