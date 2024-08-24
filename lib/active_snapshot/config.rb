@@ -4,7 +4,7 @@ module ActiveSnapshot
   class Config
     class InvalidStorageMethodError < StandardError
       def initialize(value)
-        super("Invalid storage_method provided: #{value}. Valid options are: #{STORAGE_METHODS.join(', ')}")
+        super("Invalid storage_method provided: `#{value}`. Valid options are: #{STORAGE_METHODS.join(', ')}")
       end
     end
 
