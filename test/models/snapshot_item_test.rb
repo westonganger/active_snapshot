@@ -28,23 +28,12 @@ class SnapshotItemTest < ActiveSupport::TestCase
     assert_not instance.item.nil?
   end
 
-  def test_object_validation
-    %w[serialized_yaml native_json serialized_json].each do |storage_strategy|
-      ActiveSnapshot.config.storage_method = storage_strategy
-      instance = @snapshot_item_klass.new
-
-      assert instance.invalid?
-
-      assert_equal ["can't be blank"], instance.errors[:object]
-    end
-  end
-
   def test_validations
     instance = @snapshot_item_klass.new
 
-    instance.valid?
+    assert instance.invalid?
 
-    [:item_id, :item_type, :snapshot_id].each do |attr|
+    %i[item_id item_type snapshot_id object].each do |attr|
       assert_equal ["can't be blank"], instance.errors[attr] ### presence error
     end
 
@@ -53,7 +42,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
     instance = @snapshot_item_klass.new(item: snapshot.item, snapshot: snapshot)
 
-    assert_not instance.valid?
+    assert instance.invalid?
 
     assert_equal ["has already been taken"], instance.errors[:item_id] ### uniq error
   end
