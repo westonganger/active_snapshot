@@ -3,6 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.4.0...master)
+  * [#57](https://github.com/westonganger/active_snapshot/pull/57) - Add readonly argument to Shapshot#fetch_reified_items
   * [#53](https://github.com/westonganger/active_snapshot/pull/53) - Allow `ActiveSnapshot.config` to be called before ActiveRecord `on_load` hook has occurred
   * [#52](https://github.com/westonganger/active_snapshot/pull/52) - Remove deprecated positional argument on `create_snapshot!`
 
