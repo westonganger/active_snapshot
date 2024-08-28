@@ -144,11 +144,7 @@ If you want to perform any write actions on the returned instances you will have
 
 ```ruby
 reified_parent, reified_children_hash = snapshot.fetch_reified_items(readonly: false)
-```
-
-# OR
-
-```ruby
+# or
 reified_parent, reified_children_hash = snapshot.fetch_reified_items
 reified_children_hash.first.instance_variable_set("@readonly", false)
 ```
