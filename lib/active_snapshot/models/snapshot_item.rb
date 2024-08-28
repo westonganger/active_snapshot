@@ -18,13 +18,13 @@ module ActiveSnapshot
       return @object if @object
 
       if ActiveSnapshot.config.storage_method_json?
-        @object = super() ? JSON.parse(super()) : {}
+        @object = super ? JSON.parse(super) : {}
       elsif ActiveSnapshot.config.storage_method_yaml?
         yaml_method = YAML.respond_to?(:unsafe_load) ? :unsafe_load : :load
 
-        @object = super() ? YAML.public_send(yaml_method, super()) : {}
+        @object = super ? YAML.public_send(yaml_method, super) : {}
       elsif ActiveSnapshot.config.storage_method_native_json?
-        @object = super()
+        @object = super
       else
         raise StandardError, "Unsupported storage_method: `#{ActiveSnapshot.config.storage_method}`"
       end
