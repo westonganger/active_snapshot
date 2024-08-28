@@ -104,7 +104,9 @@ module ActiveSnapshot
       snapshot_items.each do |si|
         reified_item = si.item_type.constantize.new(si.object)
 
-        reified_item.readonly! if readonly
+        if readonly
+          reified_item.readonly!
+        end
 
         key = si.child_group_name
 

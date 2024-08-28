@@ -107,7 +107,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert children_hash.is_a?(Hash)
 
-    assert children_hash.all? { |_k, v| v.all? { |x| x.readonly? } }
+    assert children_hash.values.all?(&:readonly?)
   end
 
   def test_fetch_reified_items_without_readonly
@@ -123,7 +123,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert children_hash.is_a?(Hash)
 
-    assert children_hash.all? { |_k, v| v.all? { |x| x.readonly? } }
+    assert children_hash.values.all?(&:readonly?)
   end
 
   def test_fetch_reified_items_with_sti_class

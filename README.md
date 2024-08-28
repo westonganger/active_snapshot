@@ -139,11 +139,18 @@ You can view all of the reified snapshot items by calling the following method. 
 reified_parent, reified_children_hash = snapshot.fetch_reified_items
 ```
 
-If you need to perform any write actions on the returned instances, you can now use the `readonly` parameter.
-Setting `readonly: false` will allow modifications:
+As a safety these records have the `readonly` attribute set on them.
+If you want to perform any write actions on the returned instances you will have to set the `readonly` attribute to `false`
 
 ```ruby
 reified_parent, reified_children_hash = snapshot.fetch_reified_items(readonly: false)
+```
+
+# OR
+
+```ruby
+reified_parent, reified_children_hash = snapshot.fetch_reified_items
+reified_children_hash.first.instance_variable_set("@readonly", false)
 ```
 
 # Key Models Provided & Additional Customizations
