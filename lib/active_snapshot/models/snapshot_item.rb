@@ -26,7 +26,7 @@ module ActiveSnapshot
       elsif ActiveSnapshot.config.storage_method_native_json?
         @object = super()
       else
-        raise ArgumentError, "Unsupported storage_method: `#{ActiveSnapshot.config.storage_method}`"
+        raise StandardError, "Unsupported storage_method: `#{ActiveSnapshot.config.storage_method}`"
       end
     end
 

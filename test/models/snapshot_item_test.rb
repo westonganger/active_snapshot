@@ -33,7 +33,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
     assert instance.invalid?
 
-    %i[item_id item_type snapshot_id object].each do |attr|
+    [:item_id, :item_type, :snapshot_id, :object].each do |attr|
       assert_equal ["can't be blank"], instance.errors[attr] ### presence error
     end
 
