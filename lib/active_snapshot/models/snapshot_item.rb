@@ -14,8 +14,7 @@ module ActiveSnapshot
     validates :item_type, presence: true
     validates :object, presence: true
 
-    def object(raw: false)
-      return super() if raw
+    def object
       return @object if @object
 
       if ActiveSnapshot.config.storage_method_json?
