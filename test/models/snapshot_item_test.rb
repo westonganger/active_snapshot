@@ -20,7 +20,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
       instance.snapshot = instance
     end
 
-    instance.snapshot = ActiveSnapshot::Snapshot.new
+    instance.snapshot = @snapshot_klass.new
 
     instance.item = instance
 
@@ -31,9 +31,9 @@ class SnapshotItemTest < ActiveSupport::TestCase
   def test_validations
     instance = @snapshot_item_klass.new
 
-    instance.valid?
+    assert instance.invalid?
 
-    [:item_id, :item_type, :snapshot_id].each do |attr|
+    [:item_id, :item_type, :snapshot_id, :object].each do |attr|
       assert_equal ["can't be blank"], instance.errors[attr] ### presence error
     end
 
@@ -42,7 +42,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
     instance = @snapshot_item_klass.new(item: snapshot.item, snapshot: snapshot)
 
-    assert_not instance.valid?
+    assert instance.invalid?
 
     assert_equal ["has already been taken"], instance.errors[:item_id] ### uniq error
   end

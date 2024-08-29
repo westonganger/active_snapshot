@@ -12,22 +12,21 @@ module ActiveSnapshot
     validates :snapshot_id, presence: true
     validates :item_id, presence: true, uniqueness: { scope: [:snapshot_id, :item_type] }
     validates :item_type, presence: true
+    validates :object, presence: true
 
     def object
       return @object if @object
 
       if ActiveSnapshot.config.storage_method_json?
-        @object = JSON.parse(self[:object])
+        @object = self[:object] ? JSON.parse(self[:object]) : {}
       elsif ActiveSnapshot.config.storage_method_yaml?
-        yaml_method = "unsafe_load"
+        yaml_method = YAML.respond_to?(:unsafe_load) ? :unsafe_load : :load
 
-        if !YAML.respond_to?("unsafe_load")
-          yaml_method = "load"
-        end
-
-        @object = YAML.send(yaml_method, self[:object])
+        @object = self[:object] ? YAML.public_send(yaml_method, self[:object]) : {}
       elsif ActiveSnapshot.config.storage_method_native_json?
         @object = self[:object]
+      else
+        raise StandardError, "Unsupported storage_method: `#{ActiveSnapshot.config.storage_method}`"
       end
     end
 
