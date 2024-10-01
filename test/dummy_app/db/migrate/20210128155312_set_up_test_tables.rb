@@ -4,6 +4,8 @@ class SetUpTestTables < ActiveRecord::Migration::Current
     create_table :posts do |t|
       t.integer :a, :b
 
+      t.integer :status, default: 0
+
       t.timestamps
     end
 
