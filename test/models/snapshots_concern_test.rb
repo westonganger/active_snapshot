@@ -124,4 +124,12 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
     end
   end
 
+  def test_create_snapshot_returns_valid_snapshot
+    post = Post.first
+
+    snapshot = post.create_snapshot!
+
+    assert snapshot.valid?
+  end
+
 end

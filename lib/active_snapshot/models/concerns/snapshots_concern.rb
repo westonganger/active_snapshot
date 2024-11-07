@@ -33,6 +33,8 @@ module ActiveSnapshot
       end
 
       SnapshotItem.upsert_all(new_entries.map{|x| x.delete("id"); x }, returning: false)
+      # reset the snapshot_items association so that the new snapshot items are loaded
+      snapshot.snapshot_items.reset
 
       snapshot
     end
