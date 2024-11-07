@@ -88,6 +88,16 @@ class SnapshotTest < ActiveSupport::TestCase
     @snapshot.build_snapshot_item(Post.first, child_group_name: :foobar)
   end
 
+  def test_build_snapshot_item_stores_enum_database_value
+    @snapshot = @snapshot_klass.first
+
+    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+
+    assert snapshot_item.object['status'] == 0
+
+    assert_equal @snapshot.snapshot_items.first.object['status'], snapshot_item.object['status']
+  end
+
   def test_restore
     @snapshot = @snapshot_klass.first
 

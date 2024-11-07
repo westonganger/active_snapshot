@@ -1,6 +1,8 @@
 class Post < ActiveRecord::Base
   include ActiveSnapshot
 
+  enum status: [:draft, :published]
+
   has_many :comments
   has_many :notes
 
