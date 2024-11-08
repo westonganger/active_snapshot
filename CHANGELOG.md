@@ -3,6 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.4.0...master)
+  * [#61](https://github.com/westonganger/active_snapshot/pull/61) - Ensure snapshot record returned by `create_snapshot!` is `valid?`
   * [#60](https://github.com/westonganger/active_snapshot/pull/60) - Store enum value as integer
   * [#56](https://github.com/westonganger/active_snapshot/pull/56) - Add presence validation for object in SnapshotItem model
   * [#57](https://github.com/westonganger/active_snapshot/pull/57) - Add readonly argument to Shapshot#fetch_reified_items
