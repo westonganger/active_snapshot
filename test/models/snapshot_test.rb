@@ -90,12 +90,21 @@ class SnapshotTest < ActiveSupport::TestCase
 
   def test_build_snapshot_item_stores_enum_database_value
     @snapshot = @snapshot_klass.first
+    post = Post.first
 
-    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+    snapshot_item = @snapshot.build_snapshot_item(post)
 
     assert snapshot_item.object['status'] == 0
 
     assert_equal @snapshot.snapshot_items.first.object['status'], snapshot_item.object['status']
+
+    # Test for enum value nil
+    post.status = nil
+
+    snapshot_item = @snapshot.build_snapshot_item(post)
+
+    assert snapshot_item.object['status'].nil?
+    assert_equal @snapshot.snapshot_items.last.object['status'], snapshot_item.object['status']
   end
 
   def test_restore

@@ -48,7 +48,7 @@ module ActiveSnapshot
     def build_snapshot_item(instance, child_group_name: nil)
       attributes = instance.attributes
       attributes.each do |k, v|
-        if instance.class.defined_enums.key?(k)
+        if instance.class.defined_enums.key?(k) && v.present?
           attributes[k] = instance.class.defined_enums.fetch(k).fetch(v)
         end
       end
