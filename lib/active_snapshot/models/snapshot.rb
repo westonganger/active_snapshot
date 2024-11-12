@@ -112,7 +112,15 @@ module ActiveSnapshot
       reified_parent = nil
 
       snapshot_items.each do |si|
-        reified_item = si.item_type.constantize.new(si.object)
+        reified_item = si.item_type.constantize.new
+
+        si.object.each do |k,v|
+          if reified_item.respond_to?("#{k}=")
+            reified_item[k] = v
+          else
+            # database column was likely dropped since the snapshot was created
+          end
+        end
 
         if readonly
           reified_item.readonly!

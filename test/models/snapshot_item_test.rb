@@ -67,4 +67,17 @@ class SnapshotItemTest < ActiveSupport::TestCase
     @snapshot_item.restore_item!
   end
 
+  def test_restore_item_handles_dropped_columns!
+    snapshot = @snapshot_klass.includes(:snapshot_items).first
+
+    snapshot_item = snapshot.snapshot_items.first
+
+    attrs = snapshot_item.object
+    attrs["foo"] = "bar"
+
+    snapshot_item.update!(object: attrs)
+
+    snapshot_item.restore_item!
+  end
+
 end
