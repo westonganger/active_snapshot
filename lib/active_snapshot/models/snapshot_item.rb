@@ -51,7 +51,13 @@ module ActiveSnapshot
         self.item = item_klass.new
       end
 
-      item.assign_attributes(object)
+      object.each do |k,v|
+        if item.respond_to?("#{k}=")
+          item[k] = v
+        else
+          # database column was likely dropped since the snapshot was created
+        end
+      end
 
       item.save!(validate: false, touch: false)
     end

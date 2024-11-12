@@ -192,6 +192,19 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal comment_content, reified_items.second[:comments].first.content
   end
 
+  def test_fetch_reified_items_handles_dropped_columns!
+    snapshot = @snapshot_klass.first
+
+    snapshot_item = snapshot.snapshot_items.first
+
+    attrs = snapshot_item.object
+    attrs["foo"] = "bar"
+
+    snapshot_item.update!(object: attrs)
+
+    reified_items = snapshot.fetch_reified_items(readonly: false)
+  end
+
   def test_single_model_snapshots_without_children
     instance = ParentWithoutChildren.create!({a: 1, b: 2})
 

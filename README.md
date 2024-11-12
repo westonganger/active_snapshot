@@ -131,9 +131,11 @@ end
 
 Now when you run `create_snapshot!` the associations will be tracked accordingly
 
-# Reifying Snapshot Items
+# Reifying Snapshots
 
-You can view all of the reified snapshot items by calling the following method. Its completely up to you on how to use this data.
+A reified record refers to an ActiveRecord instance where the local objects data is set to match the snaphotted data, but the database remains changed.
+
+You can view all of the "reified" snapshot items by calling the following method. Its completely up to you on how to use this data.
 
 ```ruby
 reified_parent, reified_children_hash = snapshot.fetch_reified_items
@@ -164,6 +166,32 @@ new_attrs = post.attributes # or could be another snapshot object
 attrs_not_changed = old_attrs.to_a.intersection(new_attrs.to_a).to_h
 
 attrs_changed = new_attrs.to_a - attrs_not_changed.to_a
+```
+
+# Important Data Considerations / Warnings
+
+### Dropping columns
+
+If you plan to use the snapshot restore capabilities please be aware:
+
+Whenever you drop a database column and there already exists snapshots of that model then you are kind of silently breaking your restore mechanism. Because now the application will not be able to assign data to columns that dont exist on the model. We work around this by bypassing the attribute assignment for snapshot item object entries that does not correlate to a current database column.
+
+I recommend that you add an entry to this in your applications safe-migrations guidelines.
+
+If you would like to detect if this situation has already ocurred you can use the following script:
+
+```ruby
+SnapshotItem.all.each do |snapshot_item|
+  snapshot_item.object.keys.each do |key|
+    klass = Class.const_get(snapshot_item.item_type)
+
+    if !klass.column_names.include?(key)
+      invalid_data = snapshot_item.object.slice(*klass.column_names)
+
+      raise "invalid data found - #{invalid_data}"
+    end
+  end
+end
 ```
 
 # Key Models Provided & Additional Customizations
