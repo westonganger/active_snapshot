@@ -57,30 +57,12 @@ else
   ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __dir__)).migrate
 end
 
-require 'rspec/mocks'
-module MinitestRSpecMocksIntegration
-  include RSpec::Mocks::ExampleMethods
+require "rspec/mocks/minitest_integration"
 
-  def before_setup
-    RSpec::Mocks.setup
-    super
-  end
-
-  def after_teardown
-    super
-    RSpec::Mocks.verify
-  ensure
-    RSpec::Mocks.teardown
-  end
-end
-Minitest::Test.send(:include, MinitestRSpecMocksIntegration)
-
-DATA = {}.with_indifferent_access
-
-DATA[:shared_post] = Post.create!(a: 1, b: 3)
-DATA[:shared_post].create_snapshot!(identifier: 'v1')
-DATA[:shared_post].update_columns(a: 2, b: 4)
-DATA[:shared_post].create_snapshot!(identifier: 'v2')
+post = Post.create!(a: 1, b: 3)
+post.create_snapshot!(identifier: 'v1')
+post.update_columns(a: 2, b: 4)
+post.create_snapshot!(identifier: 'v2')
 
 def assert_time_match(a, b)
   format = "%d-%m-%Y %h:%M:%S.%L" ### MUST LIMIT THE MILLISECONDS TO 3 decimal places of accuracy, the rest are dropped

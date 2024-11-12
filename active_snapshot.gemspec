@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("{lib/**/*}") + %w{ LICENSE README.md Rakefile CHANGELOG.md }
   s.require_path = 'lib'
 
-  s.add_runtime_dependency "activerecord", ">= 6.0"
+  s.add_runtime_dependency "activerecord", ">= 6.1"
   s.add_runtime_dependency "railties"
 
   s.add_development_dependency "rake"

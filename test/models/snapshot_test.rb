@@ -10,7 +10,7 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_relationships
-    shared_post = DATA[:shared_post]
+    shared_post = Post.first!
 
     instance = @snapshot_klass.new
 
@@ -38,7 +38,7 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_validations
-    shared_post = DATA[:shared_post]
+    shared_post = Post.first!
     snapshot = shared_post.snapshots.first
 
     instance = @snapshot_klass.new

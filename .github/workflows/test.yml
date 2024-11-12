@@ -26,8 +26,6 @@ jobs:
           - ruby: "3.3"
           ### TEST RAILS VERSIONS
           - ruby: "2.6"
-            rails_version: "~> 6.0.0"
-          - ruby: "2.6"
             rails_version: "~> 6.1.0"
           - ruby: "3.3"
             rails_version: "~> 7.0.0"
@@ -38,6 +36,11 @@ jobs:
             rails_version: "~> 7.2.0"
           - ruby: "3.3"
             rails_version: "~> 8.0.0"
+          ### DB TESTING TESTING
+          - ruby: 3.3
+            db_gem: "mysql2"
+          - ruby: 3.3
+            db_gem: "pg"
           ### STORAGE METHOD TESTING
           - ruby: 3.3
             db_gem: "sqlite3"
@@ -46,26 +49,17 @@ jobs:
             db_gem: "sqlite3"
             active_snapshot_storage_method: "serialized_yaml"
           - ruby: 3.3
-            db_gem: "sqlite3"
-            active_snapshot_storage_method: "native_json"
-          - ruby: 3.3
             db_gem: "mysql2"
             active_snapshot_storage_method: "serialized_json"
           - ruby: 3.3
             db_gem: "mysql2"
             active_snapshot_storage_method: "serialized_yaml"
           - ruby: 3.3
-            db_gem: "mysql2"
-            active_snapshot_storage_method: "native_json"
-          - ruby: 3.3
             db_gem: "pg"
             active_snapshot_storage_method: "serialized_json"
           - ruby: 3.3
             db_gem: "pg"
             active_snapshot_storage_method: "serialized_yaml"
-          - ruby: 3.3
-            db_gem: "pg"
-            active_snapshot_storage_method: "native_json"
 
     services:
       mysql:

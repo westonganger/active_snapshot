@@ -11,16 +11,30 @@ class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
       ActiveSnapshot.config.storage_method = @orig_storage_method
     end
 
-    def test_defaults_to_serialized_json
+    def test_defaults_to_serialized_json_if_text_column_exists
       if ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"].present?
         skip
       end
 
+      ActiveSnapshot.config.instance_variable_set("@storage_method", nil)
+
+      allow(ActiveSnapshot::SnapshotItem).to receive(:type_for_attribute).with(:object).and_return(ActiveRecord::Type::Text.new)
+
       assert_equal 'serialized_json', ActiveSnapshot.config.storage_method
 
       assert_equal false, ActiveSnapshot.config.storage_method_yaml?
-      assert_equal true, ActiveSnapshot.config.storage_method_json?
-      assert_equal false, ActiveSnapshot.config.storage_method_native_json?
+      assert_equal true, ActiveSnapshot.config.storage_method_serialized_json?
+    end
+
+    def test_defaults_to_native_json
+      if ENV["ACTIVE_SNAPSHOT_STORAGE_METHOD"].present?
+        skip
+      end
+
+      assert_equal 'native_json', ActiveSnapshot.config.storage_method
+
+      assert_equal false, ActiveSnapshot.config.storage_method_yaml?
+      assert_equal false, ActiveSnapshot.config.storage_method_serialized_json?
     end
 
     def test_accepts_to_serialized_json
@@ -29,8 +43,7 @@ class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
       assert_equal 'serialized_json', ActiveSnapshot.config.storage_method
 
       assert_equal false, ActiveSnapshot.config.storage_method_yaml?
-      assert_equal true, ActiveSnapshot.config.storage_method_json?
-      assert_equal false, ActiveSnapshot.config.storage_method_native_json?
+      assert_equal true, ActiveSnapshot.config.storage_method_serialized_json?
     end
 
 
@@ -40,8 +53,7 @@ class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
       assert_equal 'serialized_yaml', ActiveSnapshot.config.storage_method
 
       assert_equal true, ActiveSnapshot.config.storage_method_yaml?
-      assert_equal false, ActiveSnapshot.config.storage_method_json?
-      assert_equal false, ActiveSnapshot.config.storage_method_native_json?
+      assert_equal false, ActiveSnapshot.config.storage_method_serialized_json?
     end
 
     def test_accepts_native_json
@@ -50,8 +62,7 @@ class ActiveSnapshot::ConfigTest < ActiveSupport::TestCase
       assert_equal "native_json", ActiveSnapshot.config.storage_method, "native_json"
 
       assert_equal false, ActiveSnapshot.config.storage_method_yaml?
-      assert_equal false, ActiveSnapshot.config.storage_method_json?
-      assert_equal true, ActiveSnapshot.config.storage_method_native_json?
+      assert_equal false, ActiveSnapshot.config.storage_method_serialized_json?
     end
 
     def test_config_doesnt_accept_not_specified_storage_methods

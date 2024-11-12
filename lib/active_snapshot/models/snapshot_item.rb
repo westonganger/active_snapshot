@@ -17,27 +17,29 @@ module ActiveSnapshot
     def object
       return @object if @object
 
-      if ActiveSnapshot.config.storage_method_json?
+      if ActiveSnapshot.config.storage_method_serialized_json?
+        # for legacy active_snapshot configurations only
         @object = self[:object] ? JSON.parse(self[:object]) : {}
       elsif ActiveSnapshot.config.storage_method_yaml?
+        # for legacy active_snapshot configurations only
         yaml_method = YAML.respond_to?(:unsafe_load) ? :unsafe_load : :load
 
         @object = self[:object] ? YAML.public_send(yaml_method, self[:object]) : {}
-      elsif ActiveSnapshot.config.storage_method_native_json?
-        @object = self[:object]
       else
-        raise StandardError, "Unsupported storage_method: `#{ActiveSnapshot.config.storage_method}`"
+        @object = self[:object]
       end
     end
 
     def object=(h)
       @object = nil
 
-      if ActiveSnapshot.config.storage_method_json?
+      if ActiveSnapshot.config.storage_method_serialized_json?
+        # for legacy active_snapshot configurations only
         self[:object] = h.to_json
       elsif ActiveSnapshot.config.storage_method_yaml?
+        # for legacy active_snapshot configurations only
         self[:object] = YAML.dump(h)
-      elsif ActiveSnapshot.config.storage_method_native_json?
+      else
         self[:object] = h
       end
     end
