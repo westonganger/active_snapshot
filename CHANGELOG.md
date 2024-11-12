@@ -2,7 +2,11 @@ CHANGELOG
 ---------
 
 - **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.0...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.1...master)
+  * Nothing yet
+
+- **v0.5.1** - Nov 11, 2024
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.0...v0.5.1)
   * [#66](https://github.com/westonganger/active_snapshot/pull/66) - Ensure `SnapshotItem#restore_item!` and `Snapshot#fetch_reified_items` bypass assignment for snapshot object data where the associated column no longer exists.
   * [#63](https://github.com/westonganger/active_snapshot/pull/63) - Fix bug when enum value is nil
 
