@@ -2,7 +2,11 @@ CHANGELOG
 ---------
 
 - **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.1...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.2...master)
+  * Nothing yet
+
+- **Unreleased**
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.1...v0.5.2)
   * [#67](https://github.com/westonganger/active_snapshot/pull/67) - Switch default storage method to native SQL JSON columns. No longer recommend to set `ActiveSnapshot.config.storage_method`, its only retained to support legacy installations
   * Drop support for Rails 6.0. Rails 6.1 is minimum required version now.
 
