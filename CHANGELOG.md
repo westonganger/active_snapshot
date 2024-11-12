@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.0...master)
-  * Nothing yet
+  * [#63](https://github.com/westonganger/active_snapshot/pull/63) - Fix bug when enum value is nil
 
 - **v0.5.0** - Nov 8, 2024
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.4.0...v0.5.0)

@@ -88,14 +88,57 @@ class SnapshotTest < ActiveSupport::TestCase
     @snapshot.build_snapshot_item(Post.first, child_group_name: :foobar)
   end
 
-  def test_build_snapshot_item_stores_enum_database_value
-    @snapshot = @snapshot_klass.first
+  def test_snapshot_item_stores_enum_column_database_value
+    assert Post.defined_enums.has_key?("status")
 
-    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+    post = Post.first
 
-    assert snapshot_item.object['status'] == 0
+    enum_mapping = post.class.defined_enums.fetch("status")
 
-    assert_equal @snapshot.snapshot_items.first.object['status'], snapshot_item.object['status']
+    post.status = "published"
+
+    snapshot = post.create_snapshot!(identifier: "enum-test")
+
+    snapshot_item = snapshot.snapshot_items.find_by(item_type: "Post")
+
+    stored_value = snapshot_item.object["status"]
+
+    assert_equal 1, stored_value
+    assert_equal "published", enum_mapping.invert.fetch(stored_value)
+  end
+
+  def test_snapshot_item_handles_nil_enum_column_value
+    assert Post.defined_enums.has_key?("status")
+
+    post = Post.first
+
+    enum_mapping = post.class.defined_enums.fetch("status")
+
+    post.status = nil
+
+    snapshot = post.create_snapshot!(identifier: "enum-test")
+
+    snapshot_item = snapshot.snapshot_items.find_by(item_type: "Post")
+
+    stored_value = snapshot_item.object["status"]
+
+    assert_equal nil, stored_value
+  end
+
+  def test_snapshot_item_handles_enum_values_from_select_statement
+    assert Post.defined_enums.has_key?("status")
+
+    assert_equal "draft", Post.first.status
+
+    post = Post.select(:id).first
+
+    snapshot = post.create_snapshot!(identifier: "enum-test")
+
+    snapshot_item = snapshot.snapshot_items.find_by(item_type: "Post")
+
+    stored_value = snapshot_item.object["status"]
+
+    assert_equal nil, stored_value
   end
 
   def test_restore
