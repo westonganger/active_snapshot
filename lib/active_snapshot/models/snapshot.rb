@@ -46,15 +46,18 @@ module ActiveSnapshot
     end
 
     def build_snapshot_item(instance, child_group_name: nil)
-      attributes = instance.attributes
-      attributes.each do |k, v|
-        if instance.class.defined_enums.key?(k)
-          attributes[k] = instance.class.defined_enums.fetch(k).fetch(v)
+      attrs = instance.attributes
+
+      if instance.class.defined_enums.any?
+        instance.class.defined_enums.slice(*attrs.keys).each do |enum_col_name, enum_mapping|
+          val = attrs.fetch(enum_col_name)
+          next if val.nil?
+          attrs[enum_col_name] = enum_mapping.fetch(val)
         end
       end
 
       self.snapshot_items.new({
-        object: attributes,
+        object: attrs,
         item_id: instance.id,
         item_type: instance.class.name,
         child_group_name: child_group_name,
