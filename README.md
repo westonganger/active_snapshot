@@ -149,6 +149,23 @@ reified_parent, reified_children_hash = snapshot.fetch_reified_items
 reified_children_hash.first.instance_variable_set("@readonly", false)
 ```
 
+# Diffing Versions
+
+You can use the following example code to generate your own diffs.
+
+```ruby
+snapshot = post.snapshots.find_by!(identifier: "some-identifier")
+
+snapshot_item = snapshot.snapshot_items.find_by!(item_type: "Post")
+
+old_attrs = snapshot_item.object
+new_attrs = post.attributes # or could be another snapshot object
+
+attrs_not_changed = old_attrs.to_a.intersection(new_attrs.to_a).to_h
+
+attrs_changed = new_attrs.to_a - attrs_not_changed.to_a
+```
+
 # Key Models Provided & Additional Customizations
 
 A key aspect of this library is its simplicity and small API. For major functionality customizations we encourage you to first delete this gem and then copy this gems code directly into your repository.
