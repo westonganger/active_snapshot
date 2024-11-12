@@ -144,7 +144,9 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_restore
     @snapshot = @snapshot_klass.first
 
-    @snapshot.restore!
+    assert_nothing_raised do
+      @snapshot.restore!
+    end
   end
 
   def test_fetch_reified_items_with_readonly
@@ -202,7 +204,9 @@ class SnapshotTest < ActiveSupport::TestCase
 
     snapshot_item.update!(object: attrs)
 
-    reified_items = snapshot.fetch_reified_items(readonly: false)
+    assert_nothing_raised do
+      snapshot.fetch_reified_items(readonly: false)
+    end
   end
 
   def test_single_model_snapshots_without_children

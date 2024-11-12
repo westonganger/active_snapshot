@@ -64,7 +64,9 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
     @snapshot_item = @snapshot.snapshot_items.first
 
-    @snapshot_item.restore_item!
+    assert_nothing_raised do
+      @snapshot_item.restore_item!
+    end
   end
 
   def test_restore_item_handles_dropped_columns!
@@ -77,7 +79,9 @@ class SnapshotItemTest < ActiveSupport::TestCase
 
     snapshot_item.update!(object: attrs)
 
-    snapshot_item.restore_item!
+    assert_nothing_raised do
+      snapshot_item.restore_item!
+    end
   end
 
 end
