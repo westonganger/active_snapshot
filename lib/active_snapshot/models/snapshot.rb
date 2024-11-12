@@ -18,9 +18,11 @@ module ActiveSnapshot
     def metadata
       return @metadata if @metadata
 
-      if ActiveSnapshot.config.storage_method_json?
+      if ActiveSnapshot.config.storage_method_serialized_json?
+        # for legacy active_snapshot configurations only
         @metadata = JSON.parse(self[:metadata])
       elsif ActiveSnapshot.config.storage_method_yaml?
+        # for legacy active_snapshot configurations only
         yaml_method = "unsafe_load"
 
         if !YAML.respond_to?("unsafe_load")
@@ -28,7 +30,7 @@ module ActiveSnapshot
         end
 
         @metadata = YAML.send(yaml_method, self[:metadata])
-      elsif ActiveSnapshot.config.storage_method_native_json?
+      else
         @metadata = self[:metadata]
       end
     end
@@ -36,11 +38,13 @@ module ActiveSnapshot
     def metadata=(h)
       @metadata = nil
 
-      if ActiveSnapshot.config.storage_method_json?
+      if ActiveSnapshot.config.storage_method_serialized_json?
+        # for legacy active_snapshot configurations only
         self[:metadata] = h.to_json
       elsif ActiveSnapshot.config.storage_method_yaml?
+        # for legacy active_snapshot configurations only
         self[:metadata] = YAML.dump(h)
-      elsif ActiveSnapshot.config.storage_method_native_json?
+      else
         self[:metadata] = h
       end
     end

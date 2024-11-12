@@ -37,8 +37,8 @@ class SnapshotItemTest < ActiveSupport::TestCase
       assert_equal ["can't be blank"], instance.errors[attr] ### presence error
     end
 
-    shared_post = DATA[:shared_post]
-    snapshot = shared_post.snapshots.first
+    post = Post.first!
+    snapshot = post.snapshots.first
 
     instance = @snapshot_item_klass.new(item: snapshot.item, snapshot: snapshot)
 

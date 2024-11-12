@@ -53,25 +53,6 @@ It defines an optional extension to your model: `has_snapshot_children`.
 
 It defines one instance method to your model: `create_snapshot!`
 
-# Using a different storage format
-
-By default ActiveSnapshot encodes objects to JSON and stores in the database as plain text. If you prefer to have YAML encoded columns or native JSON DB columns you can configure this as follows:
-
-```ruby
-ActiveSnapshot.config do |config|
-  config.storage_method = "serialized_json" # default, for text column
-  #config.storage_method = "serialized_yaml" # for text column
-  #config.storage_method = "native_json" # for json/jsonb column
-end
-```
-
-If using a native json column, you should configure the `storage_method` before generating the migration. If this step was missed then you would need to create a migration to change the `:object` and `:metadata` columns to json (or jsonb)
-
-```ruby
-change_column :snapshots, :object, :json
-change_column :snapshots, :metadata, :json
-```
-
 # Basic Usage
 
 You now have access to the following methods:
