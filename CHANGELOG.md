@@ -7,7 +7,7 @@ CHANGELOG
 
 - **v0.5.2** - Nov 11, 2024
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.1...v0.5.2)
-  * [#67](https://github.com/westonganger/active_snapshot/pull/67) - Switch default storage method to native SQL JSON columns. No longer recommend to set `ActiveSnapshot.config.storage_method`, its only retained to support legacy installations
+  * [#67](https://github.com/westonganger/active_snapshot/pull/67) - Switch default storage method to native SQL JSON columns. No longer recommend to set `ActiveSnapshot.config.storage_method`, this configuration option is only retained to support legacy installations which utilize serialized YAML or serialized JSON text columns. The default storage method will fallback gracefully for legacy installations, if there already exists a text column then it defaults to `ActiveSnapshot.config.storage_method = "serialized_json"`
   * Drop support for Rails 6.0. Rails 6.1 is minimum required version now.
 
 - **v0.5.1** - Nov 11, 2024
@@ -47,9 +47,9 @@ CHANGELOG
   * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - Change default storage method from `serialized_yaml` to `serialized_json`.
   * [PR #32](https://github.com/westonganger/active_snapshot/pull/32) - `snapshot.metadata` and `snapshot_item.object` no longer return a HashWithIndifferentAccess. Now they simply return a regular Hash.
   * **Upgrade Instructions**
-    * Change all instances of `create_snapshot!("my-snapshot-1"` to `create_snapshot!(identifier: "my-snapshot-1"`
+    * Change all instances of `create_snapshot!("my-snapshot-1"` to `create_snapshot!(identifier: "my-snapshot-1")`
     * Create a migration with the following `change_column_null :snapshots, :identifier, true` to remove the null constraint here
-    * If you have existing snapshots from a previous version then please set `ActiveSnapshot.config.storage_method = "serialized_yaml"`
+    * If you have existing snapshots from a previous version then please set `ActiveSnapshot.config.storage_method = "serialized_yaml"` in an initializer
 
 - **v0.2.4** - Feb 25, 2022
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.2.3...v0.2.4)
