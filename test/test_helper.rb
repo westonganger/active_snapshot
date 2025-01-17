@@ -1,6 +1,8 @@
 #$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 ENV["RAILS_ENV"] = "test"
 
+require "logger" # Fix for Rails 7.0 and below, https://github.com/rails/rails/pull/54264
+
 require "active_support/all"
 
 ActiveSupport.on_load(:active_record) do
