@@ -2,8 +2,12 @@ CHANGELOG
 ---------
 
 - **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.2...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.0.0...master)
   * Nothing yet
+
+- **v1.0.0** - Jan 17 2025
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.2...v1.0.0)
+  * There are no functional changes. This release v1.0.0 is to signal that its stable and ready for widespread usage.
 
 - **v0.5.2** - Nov 11, 2024
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.1...v0.5.2)
