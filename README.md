@@ -51,7 +51,7 @@ has_many :snapshot_items, as: :item, class_name: 'SnapshotItem'
 
 It defines an optional extension to your model: `has_snapshot_children`.
 
-It defines one instance method to your model: `create_snapshot!`
+It defines two instance methods to your model: `create_snapshot!` and `build_snapshot!`
 
 # Basic Usage
 
@@ -75,6 +75,9 @@ snapshot.restore!
 # Destroy snapshot and all its child snapshots
 # must be performed manually, snapshots and snapshot items are NEVER destroyed automatically
 snapshot.destroy!
+
+# Build snapshot, useful for comparing diffs between current instance and saved snapshots
+current_snapshot = post.build_snapshot!
 ```
 
 # Tracking Associated / Child Records
@@ -196,7 +199,7 @@ I strongly encourage you to read the code for this library to understand how it 
 
 - [SnapshotsConcern](./lib/active_snapshot/models/concerns/snapshots_concern.rb)
   * Defines `snapshots` and `snapshot_items` has_many associations
-  * Defines `create_snapshot!` and `has_snapshot_children` methods
+  * Defines `create_snapshot!`, `build_snapshot!`, and `has_snapshot_children` methods
 - [Snapshot](./lib/active_snapshot/models/snapshot.rb)
   * Contains a unique `identifier` column (optional, but available for custom identification purposes)
   * `has_many :item_snapshots`

@@ -132,4 +132,62 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
     assert snapshot.valid?
   end
 
+  def test_build_snapshot
+    post = Post.create!
+    snapshot = post.build_snapshot!
+
+    assert_equal post.id, snapshot.item_id
+    assert_equal "Post", snapshot.item_type
+    assert_nil snapshot.id
+
+    assert_equal 1, snapshot.snapshot_items.size
+
+    snapshot_item = snapshot.snapshot_items.first
+    assert_equal post.id, snapshot_item.item_id
+    assert_equal "Post", snapshot_item.item_type
+    assert_nil snapshot_item.child_group_name
+  end
+
+  def test_build_snapshot_with_identifier_user_and_metadata
+    post = Post.create!
+    user = Post.create! # Using Post as user class for simplicity
+    metadata = {"key" => "value"}
+
+    snapshot = post.build_snapshot!(identifier: "v1", user: user, metadata: metadata)
+
+    assert_equal "v1", snapshot.identifier
+    assert_equal user.id, snapshot.user_id
+    assert_equal user.class.name, snapshot.user_type
+    assert_equal metadata, snapshot.metadata
+  end
+
+  def test_build_snapshot_with_children
+    post = Post.create!(a: 1, b: 2)
+    comment = Comment.create!(content: "Test", post: post)
+    note = Note.create!(body: "Test note", post: post)
+
+    Post.has_snapshot_children do
+      {
+        comments: {records: comments},
+        notes: {records: notes}
+      }
+    end
+
+    snapshot = post.build_snapshot!
+
+    assert_equal 3, snapshot.snapshot_items.size
+
+    post_item = snapshot.snapshot_items.find { |i| i.item_type == "Post" && i.item_id == post.id }
+    assert_nil post_item.id
+    assert_nil post_item.child_group_name
+
+    comment_item = snapshot.snapshot_items.find { |i| i.item_type == "Comment" && i.item_id == comment.id }
+    assert_nil comment_item.id
+    assert_equal "comments", comment_item.child_group_name
+
+    note_item = snapshot.snapshot_items.find { |i| i.item_type == "Note" && i.item_id == note.id }
+    assert_nil note_item.id
+    assert_equal "notes", note_item.child_group_name
+  end
+
 end
