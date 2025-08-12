@@ -145,5 +145,80 @@ module ActiveSnapshot
       return [reified_parent, reified_children_hash]
     end
 
+    def diff(new_snapshot)
+      old_snapshot_items = snapshot_items
+      new_snapshot_items = new_snapshot.snapshot_items
+
+      diffs = []
+
+      old_snapshot_items.each do |old_snapshot_item|
+        new_snapshot_item = new_snapshot_items.find do |item|
+          item.item_id == old_snapshot_item.item_id && item.item_type == old_snapshot_item.item_type
+        end
+
+        if new_snapshot_item.nil?
+          diffs << {
+            action: :destroy,
+            item_id: old_snapshot_item.item_id,
+            item_type: old_snapshot_item.item_type,
+            changes: diff_item(old_snapshot_item, nil)
+          }
+        else
+          changes = diff_item(old_snapshot_item, new_snapshot_item)
+
+          next if changes.empty?
+
+          diffs << {
+            action: :update,
+            item_id: old_snapshot_item.item_id,
+            item_type: old_snapshot_item.item_type,
+            changes: changes
+          }
+        end
+      end
+
+      new_snapshot_items.each do |new_snapshot_item|
+        old_snapshot_item = old_snapshot_items.find do |item|
+          item.item_id == new_snapshot_item.item_id && item.item_type == new_snapshot_item.item_type
+        end
+
+        next if old_snapshot_item.present?
+
+        diffs << {
+          action: :create,
+          item_id: new_snapshot_item.item_id,
+          item_type: new_snapshot_item.item_type,
+          changes: diff_item(nil, new_snapshot_item)
+        }
+      end
+
+      diffs
+    end
+
+    private
+
+    def diff_item(old_item, new_item)
+      old_object = old_item ? old_item.object : {}
+      new_object = new_item ? new_item.object : {}
+
+      keys = (old_object.keys + new_object.keys).uniq
+
+      diff_hash = {}
+
+      keys.each do |key|
+        old_value = old_object[key]
+        new_value = new_object[key]
+
+        next if new_value == old_value
+
+        diff_hash[key.to_sym] = {
+          from: old_value,
+          to: new_value
+        }
+      end
+
+      diff_hash
+    end
+
   end
 end

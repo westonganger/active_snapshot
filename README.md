@@ -134,7 +134,20 @@ reified_children_hash.first.instance_variable_set("@readonly", false)
 
 # Diffing Versions
 
-You can use the following example code to generate your own diffs.
+You can obtain the diff between two snapshots like this:
+```ruby
+old_snapshot = post.snapshots.first
+new_snapshot = post.snapshots.second || post.build_snapshot!
+
+old_snapshot.diff(new_snapshot)
+# [
+#   { action: :update, item_type: "Post", item_id: 1, changes: { name: { from: "Old Name", to: "New Name" } } },
+#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: { from: 1, to: nil } } },
+#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: { from: nil, to: 1 } } }
+# ]
+```
+
+You can also use the following example code to generate your own diffs.
 
 ```ruby
 snapshot = post.snapshots.find_by!(identifier: "some-identifier")

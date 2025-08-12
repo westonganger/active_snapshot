@@ -239,4 +239,49 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal prev_time_attrs.values.map{|x| x.round(2)}, new_time_attrs.values.map{|x| x.round(2)}
   end
 
+  def test_diff
+    post = Post.create!(a: 1, b: 2)
+    comment = Comment.create!(content: "First comment", post: post)
+    comment_to_destroy = Comment.create!(content: "Comment to destroy", post: post)
+    snapshot1 = post.create_snapshot!
+
+    post.update!(a: 3, b: 4)
+    comment_to_destroy.destroy!
+    new_comment = Comment.create!(content: "New comment", post: post)
+    snapshot2 = post.create_snapshot!
+
+    diff = snapshot1.diff(snapshot2)
+
+    assert_equal 3, diff.length
+
+    # Test update
+    update_diff = diff.find { |d| d[:action] == :update }
+    assert_equal :update, update_diff[:action]
+    assert_equal post.id, update_diff[:item_id] 
+    assert_equal "Post", update_diff[:item_type]
+    assert_equal 1, update_diff[:changes][:a][:from]
+    assert_equal 3, update_diff[:changes][:a][:to]
+    assert_equal 2, update_diff[:changes][:b][:from] 
+    assert_equal 4, update_diff[:changes][:b][:to]
+
+    # Test destroy
+    destroy_diff = diff.find { |d| d[:action] == :destroy }
+    assert_equal :destroy, destroy_diff[:action]
+    assert_equal comment_to_destroy.id, destroy_diff[:item_id]
+    assert_equal "Comment", destroy_diff[:item_type]
+    assert_equal "Comment to destroy", destroy_diff[:changes][:content][:from]
+    assert_nil destroy_diff[:changes][:content][:to]
+
+    # Test create
+    create_diff = diff.find { |d| d[:action] == :create }
+    assert_equal :create, create_diff[:action] 
+    assert_equal new_comment.id, create_diff[:item_id]
+    assert_equal "Comment", create_diff[:item_type]
+    assert_nil create_diff[:changes][:content][:from]
+    assert_equal "New comment", create_diff[:changes][:content][:to]
+
+    # Verify unchanged comment not in diff
+    assert_nil(diff.find { |d| d[:item_id] == comment.id && d[:item_type] == "Comment" })
+  end
+
 end
