@@ -241,13 +241,14 @@ class SnapshotTest < ActiveSupport::TestCase
 
   def test_diff
     post = Post.create!(a: 1, b: 2)
-    comment = Comment.create!(content: "First comment", post: post)
-    comment_to_destroy = Comment.create!(content: "Comment to destroy", post: post)
+    comment = post.comments.create!(content: "First comment")
+    comment_to_destroy = post.comments.create!(content: "Comment to destroy")
     snapshot1 = post.create_snapshot!
 
     post.update!(a: 3, b: 4)
     comment_to_destroy.destroy!
-    new_comment = Comment.create!(content: "New comment", post: post)
+    new_comment = post.comments.create!(content: "New comment")
+    post.comments.reload
     snapshot2 = post.create_snapshot!
 
     diff = snapshot1.diff(snapshot2)
