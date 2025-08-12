@@ -145,8 +145,8 @@ new_snapshot = post.snapshots.second || post.build_snapshot!
 old_snapshot.diff(new_snapshot)
 # [
 #   { action: :update, item_type: "Post", item_id: 1, changes: { name: { from: "Old Name", to: "New Name" } } },
-#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: { from: 1, to: nil } } },
-#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: { from: nil, to: 1 } } }
+#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: { from: 1, to: nil }, content: { from: "Some Content", to: nil } } },
+#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: { from: nil, to: 1 }, content: { from: nil, to: "New  Content" } } }
 # ]
 ```
 
