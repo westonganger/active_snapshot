@@ -8,33 +8,8 @@ module ActiveSnapshot
       has_many :snapshot_items, as: :item, class_name: 'ActiveSnapshot::SnapshotItem'
     end
 
-    def build_snapshot!(identifier: nil, user: nil, metadata: nil)
-      snapshot = snapshots.build({
-        identifier: identifier,
-        user_id: (user.id if user),
-        user_type: (user.class.name if user),
-        metadata: (metadata || {}),
-      })
-
-      new_entries = []
-
-      new_entries << snapshot.build_snapshot_item(self)
-
-      snapshot_children = self.children_to_snapshot
-
-      if snapshot_children
-        snapshot_children.each do |child_group_name, h|
-          h[:records].each do |child_item|
-            new_entries << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name)
-          end
-        end
-      end
-
-      snapshot
-    end
-
     def create_snapshot!(identifier: nil, user: nil, metadata: nil)
-      snapshot = build_snapshot!(identifier: identifier, user: user, metadata: metadata)
+      snapshot = build_snapshot(identifier: identifier, user: user, metadata: metadata)
       new_entries = snapshot.snapshot_items.map(&:attributes)
       snapshot.snapshot_items.reset # clear the association cache otherwise snapshot.valid? returns false
       snapshot.save!
@@ -130,6 +105,33 @@ module ActiveSnapshot
 
         return snapshot_children
       end
+    end
+
+    private
+
+    def build_snapshot(identifier: nil, user: nil, metadata: nil)
+      snapshot = snapshots.build({
+        identifier: identifier,
+        user_id: (user.id if user),
+        user_type: (user.class.name if user),
+        metadata: (metadata || {}),
+      })
+
+      new_entries = []
+
+      new_entries << snapshot.build_snapshot_item(self)
+
+      snapshot_children = self.children_to_snapshot
+
+      if snapshot_children
+        snapshot_children.each do |child_group_name, h|
+          h[:records].each do |child_item|
+            new_entries << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name)
+          end
+        end
+      end
+
+      snapshot
     end
 
   end

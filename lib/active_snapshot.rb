@@ -16,6 +16,7 @@ module ActiveSnapshot
 end
 
 ActiveSupport.on_load(:active_record) do
+  require "active_snapshot/models/concerns/diffable"
   require "active_snapshot/models/snapshot"
   require "active_snapshot/models/snapshot_item"
 
