@@ -111,4 +111,14 @@ class DiffableConcernTest < ActiveSupport::TestCase
       ActiveSnapshot::Snapshot.diff(from: snapshot1, to: snapshot2)
     end
   end
+
+  def test_argument_error_when_from_and_to_are_not_the_same_item_and_one_is_an_instance
+    post1 = Post.create!
+    snapshot1 = post1.create_snapshot!
+    post2 = Post.create!
+
+    assert_raises(ArgumentError) do
+      ActiveSnapshot::Snapshot.diff(from: snapshot1, to: post2)
+    end
+  end
 end
