@@ -94,7 +94,7 @@ class DiffableConcernTest < ActiveSupport::TestCase
     assert_equal "New comment", create_diff[:changes][:content][:to]
   end
 
-  def test_argument_error_when_from_and_to_are_not_snapshots
+  def test_argument_error_when_from_is_not_a_snapshot
     post = Post.create!
     assert_raises(ArgumentError) do
       ActiveSnapshot::Snapshot.diff(from: post, to: post)
@@ -119,6 +119,18 @@ class DiffableConcernTest < ActiveSupport::TestCase
 
     assert_raises(ArgumentError) do
       ActiveSnapshot::Snapshot.diff(from: snapshot1, to: post2)
+    end
+  end
+
+  def test_argument_error_when_from_is_not_newer_than_to
+    post = Post.create!
+    snapshot1 = post.create_snapshot!
+    post.update!(a: 1)
+
+    snapshot2 = post.create_snapshot!
+
+    assert_raises(ArgumentError) do
+      ActiveSnapshot::Snapshot.diff(from: snapshot2, to: snapshot1)
     end
   end
 end

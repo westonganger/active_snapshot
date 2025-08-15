@@ -17,6 +17,27 @@ module ActiveSnapshot
     validates :identifier, uniqueness: { scope: [:item_id, :item_type], allow_nil: true}
     validates :user_type, presence: true, if: :user_id
 
+    def self.build_snapshot(resource, identifier: nil, user: nil, metadata: nil)
+      snapshot = resource.snapshots.build({
+        identifier: identifier,
+        user_id: (user.id if user),
+        user_type: (user.class.name if user),
+        metadata: (metadata || {}),
+      })
+
+      snapshot.build_snapshot_item(resource)
+
+      snapshot_children = resource.children_to_snapshot
+
+      snapshot_children&.each do |child_group_name, h|
+        h[:records].each do |child_item|
+          snapshot.build_snapshot_item(child_item, child_group_name: child_group_name)
+        end
+      end
+
+      snapshot
+    end
+
     def metadata
       return @metadata if @metadata
 

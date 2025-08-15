@@ -4,19 +4,22 @@ module ActiveSnapshot
 
     class_methods do
       def diff(from:, to:)
-        if !from.is_a?(ActiveSnapshot::Snapshot) && !to.is_a?(ActiveSnapshot::Snapshot)
-          raise ArgumentError, "At least one of 'from' or 'to' must be an ActiveSnapshot::Snapshot"
+        unless from.is_a?(Snapshot)
+          raise ArgumentError, "'from' must be an ActiveSnapshot::Snapshot"
         end
 
-        from_item_id, from_item_type = from.is_a?(ActiveSnapshot::Snapshot) ? [from.item_id, from.item_type] : [from.id, from.class.name]
-        to_item_id, to_item_type = to.is_a?(ActiveSnapshot::Snapshot) ? [to.item_id, to.item_type] : [to.id, to.class.name]
+        to_item_id, to_item_type = to.is_a?(Snapshot) ? [to.item_id, to.item_type] : [to.id, to.class.name]
 
-        if from_item_id != to_item_id || from_item_type != to_item_type
+        if from.item_id != to_item_id || from.item_type != to_item_type
           raise ArgumentError, "Both 'from' and 'to' must reference the same item (item_id and item_type must match)"
         end
 
-        from_snapshot = from.is_a?(ActiveSnapshot::Snapshot) ? from : from.send(:build_snapshot)
-        to_snapshot = to.is_a?(ActiveSnapshot::Snapshot) ? to : to.send(:build_snapshot)
+        if to.is_a?(Snapshot) && from.created_at > to.created_at
+          raise ArgumentError, "'to' must be a newer snapshot than 'from'"
+        end
+
+        from_snapshot = from
+        to_snapshot = to.is_a?(Snapshot) ? to : Snapshot.build_snapshot(to)
 
         from_snapshot_items = from_snapshot.snapshot_items
         to_snapshot_items = to_snapshot.snapshot_items
