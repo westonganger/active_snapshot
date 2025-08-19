@@ -21,7 +21,7 @@ class DiffableConcernTest < ActiveSupport::TestCase
     post.comments.reload
     to_snapshot = post.create_snapshot!
 
-    diff = ActiveSnapshot::Snapshot.diff(from: from_snapshot, to: to_snapshot)
+    diff = ActiveSnapshot::Snapshot.diff(from_snapshot, to_snapshot)
 
     assert_equal 3, diff.length
 
@@ -30,26 +30,22 @@ class DiffableConcernTest < ActiveSupport::TestCase
     assert_equal :update, update_diff[:action]
     assert_equal post.id, update_diff[:item_id] 
     assert_equal "Post", update_diff[:item_type]
-    assert_equal 1, update_diff[:changes][:a][:from]
-    assert_equal 3, update_diff[:changes][:a][:to]
-    assert_equal 2, update_diff[:changes][:b][:from] 
-    assert_equal 4, update_diff[:changes][:b][:to]
+    assert_equal [1, 3], update_diff[:changes][:a]
+    assert_equal [2, 4], update_diff[:changes][:b]
 
     # Test destroy
     destroy_diff = diff.find { |d| d[:action] == :destroy }
     assert_equal :destroy, destroy_diff[:action]
     assert_equal comment_to_destroy.id, destroy_diff[:item_id]
     assert_equal "Comment", destroy_diff[:item_type]
-    assert_equal "Comment to destroy", destroy_diff[:changes][:content][:from]
-    assert_nil destroy_diff[:changes][:content][:to]
+    assert_equal ["Comment to destroy", nil], destroy_diff[:changes][:content]
 
     # Test create
     create_diff = diff.find { |d| d[:action] == :create }
     assert_equal :create, create_diff[:action] 
     assert_equal new_comment.id, create_diff[:item_id]
     assert_equal "Comment", create_diff[:item_type]
-    assert_nil create_diff[:changes][:content][:from]
-    assert_equal "New comment", create_diff[:changes][:content][:to]
+    assert_equal [nil, "New comment"], create_diff[:changes][:content]
 
     # Verify unchanged comment not in diff
     assert_nil(diff.find { |d| d[:item_id] == comment.id && d[:item_type] == "Comment" })
@@ -66,7 +62,7 @@ class DiffableConcernTest < ActiveSupport::TestCase
     new_comment = post.comments.create!(content: "New comment")
     post.comments.reload
 
-    diff = ActiveSnapshot::Snapshot.diff(from: from_snapshot, to: post)
+    diff = ActiveSnapshot::Snapshot.diff(from_snapshot, post)
 
     assert_equal 3, diff.length
 
@@ -74,30 +70,26 @@ class DiffableConcernTest < ActiveSupport::TestCase
     assert_equal :update, update_diff[:action]
     assert_equal post.id, update_diff[:item_id] 
     assert_equal "Post", update_diff[:item_type]
-    assert_equal 1, update_diff[:changes][:a][:from]
-    assert_equal 3, update_diff[:changes][:a][:to]
-    assert_equal 2, update_diff[:changes][:b][:from] 
-    assert_equal 4, update_diff[:changes][:b][:to]
+    assert_equal [1, 3], update_diff[:changes][:a]
+    assert_equal [2, 4], update_diff[:changes][:b]
 
     destroy_diff = diff.find { |d| d[:action] == :destroy }
     assert_equal :destroy, destroy_diff[:action]
     assert_equal comment_to_destroy.id, destroy_diff[:item_id]
     assert_equal "Comment", destroy_diff[:item_type]
-    assert_equal "Comment to destroy", destroy_diff[:changes][:content][:from]
-    assert_nil destroy_diff[:changes][:content][:to]
+    assert_equal ["Comment to destroy", nil], destroy_diff[:changes][:content]
 
     create_diff = diff.find { |d| d[:action] == :create }
     assert_equal :create, create_diff[:action] 
     assert_equal new_comment.id, create_diff[:item_id]
     assert_equal "Comment", create_diff[:item_type]
-    assert_nil create_diff[:changes][:content][:from]
-    assert_equal "New comment", create_diff[:changes][:content][:to]
+    assert_equal [nil, "New comment"], create_diff[:changes][:content]
   end
 
   def test_argument_error_when_from_is_not_a_snapshot
     post = Post.create!
     assert_raises(ArgumentError) do
-      ActiveSnapshot::Snapshot.diff(from: post, to: post)
+      ActiveSnapshot::Snapshot.diff(post, post)
     end
   end
 
@@ -108,7 +100,7 @@ class DiffableConcernTest < ActiveSupport::TestCase
     snapshot2 = post2.create_snapshot!
 
     assert_raises(ArgumentError) do
-      ActiveSnapshot::Snapshot.diff(from: snapshot1, to: snapshot2)
+      ActiveSnapshot::Snapshot.diff(snapshot1, snapshot2)
     end
   end
 
@@ -118,7 +110,7 @@ class DiffableConcernTest < ActiveSupport::TestCase
     post2 = Post.create!
 
     assert_raises(ArgumentError) do
-      ActiveSnapshot::Snapshot.diff(from: snapshot1, to: post2)
+      ActiveSnapshot::Snapshot.diff(snapshot1, post2)
     end
   end
 
@@ -130,7 +122,7 @@ class DiffableConcernTest < ActiveSupport::TestCase
     snapshot2 = post.create_snapshot!
 
     assert_raises(ArgumentError) do
-      ActiveSnapshot::Snapshot.diff(from: snapshot2, to: snapshot1)
+      ActiveSnapshot::Snapshot.diff(snapshot2, snapshot1)
     end
   end
 end

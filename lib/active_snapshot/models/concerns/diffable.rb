@@ -3,7 +3,7 @@ module ActiveSnapshot
     extend ActiveSupport::Concern
 
     class_methods do
-      def diff(from:, to:)
+      def diff(from, to)
         unless from.is_a?(Snapshot)
           raise ArgumentError, "'from' must be an ActiveSnapshot::Snapshot"
         end
@@ -11,7 +11,7 @@ module ActiveSnapshot
         to_item_id, to_item_type = to.is_a?(Snapshot) ? [to.item_id, to.item_type] : [to.id, to.class.name]
 
         if from.item_id != to_item_id || from.item_type != to_item_type
-          raise ArgumentError, "Both 'from' and 'to' must reference the same item (item_id and item_type must match)"
+          raise ArgumentError, "Both records must reference the same item"
         end
 
         if to.is_a?(Snapshot) && from.created_at > to.created_at
@@ -36,10 +36,10 @@ module ActiveSnapshot
               action: :destroy,
               item_id: from_snapshot_item.item_id,
               item_type: from_snapshot_item.item_type,
-              changes: item_changes(from: from_snapshot_item, to: nil)
+              changes: snapshot_item_changes(from_snapshot_item, nil)
             }
           else
-            changes = item_changes(from: from_snapshot_item, to: to_snapshot_item)
+            changes = snapshot_item_changes(from_snapshot_item, to_snapshot_item)
 
             next if changes.empty?
 
@@ -63,14 +63,16 @@ module ActiveSnapshot
             action: :create,
             item_id: to_snapshot_item.item_id,
             item_type: to_snapshot_item.item_type,
-            changes: item_changes(from: nil, to: to_snapshot_item)
+            changes: snapshot_item_changes(nil, to_snapshot_item)
           }
         end
 
         diffs
       end
 
-      def item_changes(from:, to:)
+      private
+
+      def snapshot_item_changes(from, to)
         from_object = from ? from.object : {}
         to_object = to ? to.object : {}
 
@@ -84,10 +86,7 @@ module ActiveSnapshot
 
           next if to_value == from_value
 
-          changes[key.to_sym] = {
-            from: from_value,
-            to: to_value
-          }
+          changes[key.to_sym] = [from_value, to_value]
         end
 
         changes
