@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.0.0...master)
-  * Nothing yet
+  * [#72](https://github.com/westonganger/active_snapshot/pull/72) - Adds `ActiveSnapshot::Snapshot.diff(from, to)` to get the difference between two snapshots or a snapshot and the current record.
 
 - **v1.0.0** - Jan 17 2025
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v0.5.2...v1.0.0)
