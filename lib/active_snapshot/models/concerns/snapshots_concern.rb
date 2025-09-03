@@ -9,32 +9,14 @@ module ActiveSnapshot
     end
 
     def create_snapshot!(identifier: nil, user: nil, metadata: nil)
-      snapshot = snapshots.create!({
-        identifier: identifier,
-        user_id: (user.id if user),
-        user_type: (user.class.name if user),
-        metadata: (metadata || {}),
-      })
-
-      new_entries = []
-
-      current_time = Time.now
-
-      new_entries << snapshot.build_snapshot_item(self).attributes.merge(created_at: current_time)
-
-      snapshot_children = self.children_to_snapshot
-
-      if snapshot_children
-        snapshot_children.each do |child_group_name, h|
-          h[:records].each do |child_item|
-            new_entries << snapshot.build_snapshot_item(child_item, child_group_name: child_group_name).attributes.merge(created_at: current_time)
-          end
-        end
-      end
-
-      SnapshotItem.upsert_all(new_entries.map{|x| x.delete("id"); x }, returning: false)
-
+      snapshot = Snapshot.build_snapshot(self, identifier: identifier, user: user, metadata: metadata)
+      new_entries = snapshot.snapshot_items.map(&:attributes)
       snapshot.snapshot_items.reset # clear the association cache otherwise snapshot.valid? returns false
+      snapshot.save!
+
+      new_entries = new_entries.map { |item| item.except("id").merge(created_at: snapshot.created_at, snapshot_id: snapshot.id) }
+
+      SnapshotItem.upsert_all(new_entries, returning: false)
 
       snapshot
     end
@@ -122,6 +104,5 @@ module ActiveSnapshot
         return snapshot_children
       end
     end
-
   end
 end
