@@ -51,7 +51,7 @@ has_many :snapshot_items, as: :item, class_name: 'SnapshotItem'
 
 It defines an optional extension to your model: `has_snapshot_children`.
 
-It defines two instance methods to your model: `create_snapshot!` and `build_snapshot!`
+It defines one instance method to your model: `create_snapshot!`
 
 # Basic Usage
 
@@ -75,9 +75,6 @@ snapshot.restore!
 # Destroy snapshot and all its child snapshots
 # must be performed manually, snapshots and snapshot items are NEVER destroyed automatically
 snapshot.destroy!
-
-# Build snapshot, useful for comparing diffs between current instance and saved snapshots
-current_snapshot = post.build_snapshot!
 ```
 
 # Tracking Associated / Child Records
@@ -139,14 +136,26 @@ reified_children_hash.first.instance_variable_set("@readonly", false)
 
 You can obtain the diff between two snapshots like this:
 ```ruby
-old_snapshot = post.snapshots.first
-new_snapshot = post.snapshots.second || post.build_snapshot!
+from = post.snapshots.first
+to = post.snapshots.second
 
-old_snapshot.diff(new_snapshot)
+ActiveSnapshot::Snapshot.diff(from, to)
 # [
-#   { action: :update, item_type: "Post", item_id: 1, changes: { name: { from: "Old Name", to: "New Name" } } },
-#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: { from: 1, to: nil }, content: { from: "Some Content", to: nil } } },
-#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: { from: nil, to: 1 }, content: { from: nil, to: "New  Content" } } }
+#   { action: :update, item_type: "Post", item_id: 1, changes: { name: ["Old Name", "New Name"] } },
+#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: [1, nil }, content: ["Some Content", nil] } },
+#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: [nil, 1 }, content: [nil, "New  Content"] } }
+# ]
+```
+
+You can also obtain the diff between a snapshot and the current record:
+```ruby
+from = post.snapshots.last
+
+ActiveSnapshot::Snapshot.diff(from, post)
+# [
+#   { action: :update, item_type: "Post", item_id: 1, changes: { name: ["Old Name", "New Name"] } },
+#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: [1, nil }, content: ["Some Content", nil] } },
+#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: [nil, 1 }, content: [nil, "New  Content"] } }
 # ]
 ```
 
@@ -199,7 +208,7 @@ I strongly encourage you to read the code for this library to understand how it 
 
 - [SnapshotsConcern](./lib/active_snapshot/models/concerns/snapshots_concern.rb)
   * Defines `snapshots` and `snapshot_items` has_many associations
-  * Defines `create_snapshot!`, `build_snapshot!`, and `has_snapshot_children` methods
+  * Defines `create_snapshot!` and `has_snapshot_children` methods
 - [Snapshot](./lib/active_snapshot/models/snapshot.rb)
   * Contains a unique `identifier` column (optional, but available for custom identification purposes)
   * `has_many :item_snapshots`
