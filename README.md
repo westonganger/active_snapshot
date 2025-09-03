@@ -141,9 +141,9 @@ to = post.snapshots.second
 
 ActiveSnapshot::Snapshot.diff(from, to)
 # [
-#   { action: :update, item_type: "Post", item_id: 1, changes: { name: ["Old Name", "New Name"] } },
-#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: [1, nil }, content: ["Some Content", nil] } },
-#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: [nil, 1 }, content: [nil, "New  Content"] } }
+#   {action: :update, item_type: "Post", item_id: 1, changes: {name: ["Old Name", "New Name"]}},
+#   {action: :destroy, item_type: "Comment", item_id: 1, changes: {id: [1, nil], content: ["Some Content", nil]}},
+#   {action: :create, item_type: "Comment", item_id: 2, changes: {id: [nil, 1], content: [nil, "New  Content"]}}
 # ]
 ```
 
@@ -152,26 +152,6 @@ You can also obtain the diff between a snapshot and the current record:
 from = post.snapshots.last
 
 ActiveSnapshot::Snapshot.diff(from, post)
-# [
-#   { action: :update, item_type: "Post", item_id: 1, changes: { name: ["Old Name", "New Name"] } },
-#   { action: :destroy, item_type: "Comment", item_id: 1, changes: { id: [1, nil }, content: ["Some Content", nil] } },
-#   { action: :create, item_type: "Comment", item_id: 2, changes: { id: [nil, 1 }, content: [nil, "New  Content"] } }
-# ]
-```
-
-You can also use the following example code to generate your own diffs.
-
-```ruby
-snapshot = post.snapshots.find_by!(identifier: "some-identifier")
-
-snapshot_item = snapshot.snapshot_items.find_by!(item_type: "Post")
-
-old_attrs = snapshot_item.object
-new_attrs = post.attributes # or could be another snapshot object
-
-attrs_not_changed = old_attrs.to_a.intersection(new_attrs.to_a).to_h
-
-attrs_changed = new_attrs.to_a - attrs_not_changed.to_a
 ```
 
 # Important Data Considerations / Warnings

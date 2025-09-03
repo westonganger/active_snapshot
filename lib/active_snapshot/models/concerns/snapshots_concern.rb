@@ -14,9 +14,7 @@ module ActiveSnapshot
       snapshot.snapshot_items.reset # clear the association cache otherwise snapshot.valid? returns false
       snapshot.save!
 
-      current_time = Time.now
-
-      new_entries = new_entries.map { |item| item.except("id").merge(created_at: current_time, snapshot_id: snapshot.id) }
+      new_entries = new_entries.map { |item| item.except("id").merge(created_at: snapshot.created_at, snapshot_id: snapshot.id) }
 
       SnapshotItem.upsert_all(new_entries, returning: false)
 
