@@ -3,6 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.0.0...master)
+  * [#74](https://github.com/westonganger/active_snapshot/pull/74) - Ensure no exception is raised when class does not have method defined_enums
   * [#72](https://github.com/westonganger/active_snapshot/pull/72) - Adds `ActiveSnapshot::Snapshot.diff(from, to)` to get the difference between two snapshots or a snapshot and the current record.
 
 - **v1.0.0** - Jan 17 2025
