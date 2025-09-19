@@ -164,7 +164,7 @@ module ActiveSnapshot
     def build_snapshot_item(instance, child_group_name: nil)
       attrs = instance.attributes
 
-      if instance.class.defined_enums.any?
+      if instance.class.respond_to?(:defined_enums) && instance.class.defined_enums.any?
         instance.class.defined_enums.slice(*attrs.keys).each do |enum_col_name, enum_mapping|
           val = attrs.fetch(enum_col_name)
           next if val.nil?
