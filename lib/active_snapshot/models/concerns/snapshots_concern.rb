@@ -6,6 +6,8 @@ module ActiveSnapshot
       ### We do NOT mark these as dependent: :destroy, the developer must manually destroy the snapshots or individual snapshot items
       has_many :snapshots, as: :item, class_name: 'ActiveSnapshot::Snapshot'
       has_many :snapshot_items, as: :item, class_name: 'ActiveSnapshot::SnapshotItem'
+
+      class_attribute :snapshot_children_proc
     end
 
     def create_snapshot!(identifier: nil, user: nil, metadata: nil)
@@ -25,9 +27,9 @@ module ActiveSnapshot
 
       def has_snapshot_children(&block)
         if block_given?
-          @snapshot_children_proc = block
+          self.snapshot_children_proc = block
         else
-          @snapshot_children_proc
+          self.snapshot_children_proc
         end
       end
 

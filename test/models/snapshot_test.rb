@@ -181,17 +181,68 @@ class SnapshotTest < ActiveSupport::TestCase
     assert children_hash.values.all?(&:readonly?)
   end
 
-  def test_fetch_reified_items_with_sti_class
-    post = SubPost.create!(a: 1, b: 2)
+  def test_fetch_reified_items_with_base_class
+    post = Post.create!(a: 1, b: 2)
+
     comment_content = 'Example comment'
     post.comments.create!(content: comment_content)
+
+    note_body = 'Example note'
+    post.notes.create!(body: note_body)
+
     post.create_snapshot!(identifier: 'v1')
     snapshot = post.snapshots.first
-    reified_items = snapshot.fetch_reified_items
 
-    assert_equal post, reified_items.first
-    assert reified_items.first.readonly?
-    assert_equal comment_content, reified_items.second[:comments].first.content
+    reified_post, reified_children = snapshot.fetch_reified_items
+
+    assert_equal post, reified_post
+    assert reified_post.readonly?
+    assert_equal ['comments', 'notes'], reified_children.keys.sort
+    assert_equal comment_content, reified_children['comments'].first.content
+    assert_equal note_body, reified_children['notes'].first.body
+  end
+
+  def test_fetch_reified_items_with_sti_class
+    # Inherits snapshot children definition from base class
+    post = SubPost.create!(a: 1, b: 2)
+
+    comment_content = 'Example comment'
+    post.comments.create!(content: comment_content)
+
+    note_body = 'Example note'
+    post.notes.create!(body: note_body)
+
+    post.create_snapshot!(identifier: 'v1')
+    snapshot = post.snapshots.first
+
+    reified_post, reified_children = snapshot.fetch_reified_items
+
+    assert_equal post, reified_post
+    assert reified_post.readonly?
+    assert_equal ['comments', 'notes'], reified_children.keys.sort
+    assert_equal comment_content, reified_children['comments'].first.content
+    assert_equal note_body, reified_children['notes'].first.body
+  end
+
+  def test_fetch_reified_items_with_sti_class_having_own_definition
+    # Includes "comments" children, but no "notes"
+    post = SubPostWithOwnDefinition.create!(a: 1, b: 2)
+
+    comment_content = 'Example comment'
+    post.comments.create!(content: comment_content)
+
+    note_body = 'Example note'
+    post.notes.create!(body: note_body)
+
+    post.create_snapshot!(identifier: 'v1')
+    snapshot = post.snapshots.first
+
+    reified_post, reified_children = snapshot.fetch_reified_items
+
+    assert_equal post, reified_post
+    assert reified_post.readonly?
+    assert_equal ['comments'], reified_children.keys
+    assert_equal comment_content, reified_children['comments'].first.content
   end
 
   def test_fetch_reified_items_handles_dropped_columns!

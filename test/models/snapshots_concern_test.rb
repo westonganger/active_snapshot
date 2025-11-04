@@ -58,7 +58,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
       {}
     end
 
-    assert klass.instance_variable_get(:@snapshot_children_proc).is_a?(Proc)
+    assert klass.has_snapshot_children.is_a?(Proc)
 
     klass.new.children_to_snapshot
 
