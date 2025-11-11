@@ -3,6 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.0.0...master)
+  * [#76](https://github.com/westonganger/active_snapshot/pull/76) - Add full STI support (inherit snapshot children definition from base class, and allow overriding in STI child classes)
   * [#74](https://github.com/westonganger/active_snapshot/pull/74) - Ensure no exception is raised when class does not have method defined_enums
   * [#72](https://github.com/westonganger/active_snapshot/pull/72) - Adds `ActiveSnapshot::Snapshot.diff(from, to)` to get the difference between two snapshots or a snapshot and the current record.
 
