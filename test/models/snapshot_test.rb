@@ -290,6 +290,24 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal prev_time_attrs.values.map{|x| x.round(2)}, new_time_attrs.values.map{|x| x.round(2)}
   end
 
+  def test_snapshot_with_identical_children_at_different_relations
+    user = User.create!(name: "Example User")
+
+    task = Task.create!(
+      title: "Example Task",
+      requester: user,
+      assignee: user,
+    )
+
+    task.create_snapshot!
+    snapshot = task.snapshots.first
+
+    items = snapshot.snapshot_items.order(:id)
+    assert_equal ["Task", "User", "User"], items.map(&:item_type)
+    assert_equal user.id, items[1].item_id
+    assert_equal user.id, items[2].item_id
+  end
+
   def test_diff
     post = Post.create!(a: 1, b: 2)
     comment = post.comments.create!(content: "First comment")
