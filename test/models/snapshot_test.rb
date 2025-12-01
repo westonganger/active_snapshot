@@ -217,6 +217,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     reified_post, reified_children = snapshot.fetch_reified_items
 
+    assert_equal SubPost, reified_post.class
     assert_equal post, reified_post
     assert reified_post.readonly?
     assert_equal ['comments', 'notes'], reified_children.keys.sort
@@ -361,10 +362,25 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal ["Comment to destroy", nil], destroy_diff[:changes][:content]
 
     create_diff = diff.find { |d| d[:action] == :create }
-    assert_equal :create, create_diff[:action] 
+    assert_equal :create, create_diff[:action]
     assert_equal new_comment.id, create_diff[:item_id]
     assert_equal "Comment", create_diff[:item_type]
     assert_equal [nil, "New comment"], create_diff[:changes][:content]
+  end
+
+  def test_diff_between_snapshot_and_sti_instance
+    post = SubPost.create!(a: 1, b: 2)
+    from_snapshot = post.create_snapshot!
+
+    post.update!(a: 3, b: 4)
+    diff = ActiveSnapshot::Snapshot.diff(from_snapshot, post)
+
+    update_diff = diff.find { |d| d[:action] == :update }
+    assert_equal :update, update_diff[:action]
+    assert_equal post.id, update_diff[:item_id]
+    assert_equal "SubPost", update_diff[:item_type]
+    assert_equal [1, 3], update_diff[:changes][:a]
+    assert_equal [2, 4], update_diff[:changes][:b]
   end
 
   def test_diff_argument_error_when_from_is_not_a_snapshot
