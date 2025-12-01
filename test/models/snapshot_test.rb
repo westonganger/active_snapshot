@@ -309,7 +309,7 @@ class SnapshotTest < ActiveSupport::TestCase
     # Test update
     update_diff = diff.find { |d| d[:action] == :update }
     assert_equal :update, update_diff[:action]
-    assert_equal post.id, update_diff[:item_id] 
+    assert_equal post.id, update_diff[:item_id]
     assert_equal "Post", update_diff[:item_type]
     assert_equal [1, 3], update_diff[:changes][:a]
     assert_equal [2, 4], update_diff[:changes][:b]
@@ -323,7 +323,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     # Test create
     create_diff = diff.find { |d| d[:action] == :create }
-    assert_equal :create, create_diff[:action] 
+    assert_equal :create, create_diff[:action]
     assert_equal new_comment.id, create_diff[:item_id]
     assert_equal "Comment", create_diff[:item_type]
     assert_equal [nil, "New comment"], create_diff[:changes][:content]
@@ -349,7 +349,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     update_diff = diff.find { |d| d[:action] == :update }
     assert_equal :update, update_diff[:action]
-    assert_equal post.id, update_diff[:item_id] 
+    assert_equal post.id, update_diff[:item_id]
     assert_equal "Post", update_diff[:item_type]
     assert_equal [1, 3], update_diff[:changes][:a]
     assert_equal [2, 4], update_diff[:changes][:b]
