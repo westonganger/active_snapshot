@@ -24,10 +24,8 @@ Warning.ignore(
 )
 
 ### Delete the database completely before starting
-FileUtils.rm(
-  File.expand_path("../dummy_app/db/*sqlite*",  __FILE__),
-  force: true,
-)
+require "pathname"
+Pathname.new(__dir__).join("dummy_app/db").glob("*sqlite*").each(&:delete)
 
 ### Instantiates Rails
 require File.expand_path("../dummy_app/config/environment.rb",  __FILE__)

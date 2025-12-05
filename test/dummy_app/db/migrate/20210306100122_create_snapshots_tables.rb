@@ -20,7 +20,7 @@ class CreateSnapshotsTables < ActiveRecord::Migration::Current
     create_table :snapshot_items do |t|
       t.belongs_to :snapshot, null: false, index: true
       t.belongs_to :item, polymorphic: true, null: false, index: true
-      t.index [:snapshot_id, :item_id, :item_type], unique: true
+      t.index [:snapshot_id, :item_id, :item_type]
 
       if ActiveSnapshot.config.storage_method == 'native_json'
         t.json :object, null: false
