@@ -42,7 +42,7 @@ module ActiveSnapshot
           raise ArgumentError.new("'from' must be an ActiveSnapshot::Snapshot")
         end
 
-        to_item_id, to_item_type = to.is_a?(Snapshot) ? [to.item_id, to.item_type] : [to.id, to.class.name]
+        to_item_id, to_item_type = to.is_a?(Snapshot) ? [to.item_id, to.item_type] : [to.id, to.class.polymorphic_name]
 
         if from.item_id != to_item_id || from.item_type != to_item_type
           raise ArgumentError.new("Both records must reference the same item")
