@@ -24,6 +24,21 @@ class SetUpTestTables < ActiveRecord::Migration::Current
 
       t.timestamps
     end
+
+    create_table :tasks do |t|
+      t.string :title
+
+      t.references :assignee
+      t.references :requester
+
+      t.timestamps
+    end
+
+    create_table :users do |t|
+      t.string :name
+
+      t.timestamps
+    end
   end
 
 end
