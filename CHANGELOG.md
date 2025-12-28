@@ -2,7 +2,11 @@ CHANGELOG
 ---------
 
 - **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.0.0...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.1.0...master)
+  * Nothing yet
+
+- **v1.1.0** - Dec 28 2025
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.0.0...v1.1.0)
   * [#77](https://github.com/westonganger/active_snapshot/pull/77) - Remove uniqueness constraint from `snapshot_items` table migration
     - Upgrade Instructions: Create a DB migration with `remove_index :snapshot_items, [:snapshot_id, :item_id, :item_type], unique: true`
   * [#76](https://github.com/westonganger/active_snapshot/pull/76) - Add full STI support (inherit snapshot children definition from base class, and allow overriding in STI child classes)
