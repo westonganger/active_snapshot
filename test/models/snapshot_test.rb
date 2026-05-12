@@ -452,13 +452,13 @@ class SnapshotTest < ActiveSupport::TestCase
 
       snapshot_item = snapshot.snapshot_items.find_by(item_type: "Comment", item_id: comment.id)
 
-      raw_json = ActiveRecord::Base.connection.select_value(
+      raw_value = ActiveRecord::Base.connection.select_value(
         "SELECT object FROM snapshot_items WHERE id = #{snapshot_item.id}"
       )
-      stored_object = JSON.parse(raw_json)
-
-      refute_equal plaintext, stored_object["content"],
+      refute_includes raw_value.to_s, plaintext,
         "Expected encrypted attribute to be stored as ciphertext, not plaintext"
+
+      stored_object = snapshot_item.object
       assert stored_object["content"].present?,
         "Expected ciphertext to be present"
     end
