@@ -36,6 +36,12 @@ module Dummy
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
 
+    if ActiveRecord::VERSION::MAJOR >= 7
+      config.active_record.encryption.primary_key = "test-primary-key-thats-32-bytes"
+      config.active_record.encryption.deterministic_key = "test-deterministic-key-32-bytes!"
+      config.active_record.encryption.key_derivation_salt = "test-key-derivation-salt-value!!"
+    end
+
     config.generators.test_framework = false
     config.generators.helper = false
     config.generators.stylesheets = false

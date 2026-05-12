@@ -13,6 +13,18 @@ module ActiveSnapshot
       return @@config
     end
   end
+
+  def self.deserialize_snapshot_value(klass, key:, value:)
+    return value if value.nil?
+    klass.attribute_types[key].deserialize(value)
+  rescue => e
+    if defined?(ActiveRecord::Encryption::Errors::Base) &&
+       e.is_a?(ActiveRecord::Encryption::Errors::Base)
+      value
+    else
+      raise
+    end
+  end
 end
 
 ActiveSupport.on_load(:active_record) do
