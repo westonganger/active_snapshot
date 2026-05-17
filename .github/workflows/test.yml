@@ -16,7 +16,6 @@ jobs:
       matrix:
         include:
           ### TEST RUBY VERSIONS
-          - ruby: "2.6"
           - ruby: "2.7"
           - ruby: "3.0"
             db_gem_version: "~> 1.4" # fixes sqlite3 gem dependency issue
