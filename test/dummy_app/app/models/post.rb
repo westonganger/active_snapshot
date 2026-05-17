@@ -1,11 +1,7 @@
 class Post < ActiveRecord::Base
   include ActiveSnapshot
 
-  if Rails::VERSION::MAJOR >= 7
-    enum :status, [:draft, :published]
-  else
-    enum status: [:draft, :published]
-  end
+  enum :status, [:draft, :published]
 
   has_many :comments
   has_many :notes

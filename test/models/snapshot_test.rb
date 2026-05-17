@@ -441,93 +441,89 @@ class SnapshotTest < ActiveSupport::TestCase
     end
   end
 
-  if ActiveRecord::VERSION::MAJOR >= 7
+  def test_snapshot_item_stores_encrypted_attribute_as_ciphertext
+    plaintext = "super secret comment"
+    post = Post.create!(a: 1, b: 2)
+    comment = post.comments.create!(content: plaintext)
 
-    def test_snapshot_item_stores_encrypted_attribute_as_ciphertext
-      plaintext = "super secret comment"
-      post = Post.create!(a: 1, b: 2)
-      comment = post.comments.create!(content: plaintext)
+    snapshot = post.create_snapshot!
 
-      snapshot = post.create_snapshot!
+    snapshot_item = snapshot.snapshot_items.find_by(item_type: "Comment", item_id: comment.id)
 
-      snapshot_item = snapshot.snapshot_items.find_by(item_type: "Comment", item_id: comment.id)
+    raw_value = ActiveRecord::Base.connection.select_value(
+      "SELECT object FROM snapshot_items WHERE id = #{snapshot_item.id}"
+    )
+    refute_includes raw_value.to_s, plaintext,
+      "Expected encrypted attribute to be stored as ciphertext, not plaintext"
 
-      raw_value = ActiveRecord::Base.connection.select_value(
-        "SELECT object FROM snapshot_items WHERE id = #{snapshot_item.id}"
-      )
-      refute_includes raw_value.to_s, plaintext,
-        "Expected encrypted attribute to be stored as ciphertext, not plaintext"
+    stored_object = snapshot_item.object
+    assert stored_object["content"].present?,
+      "Expected ciphertext to be present"
+  end
 
-      stored_object = snapshot_item.object
-      assert stored_object["content"].present?,
-        "Expected ciphertext to be present"
-    end
+  def test_fetch_reified_items_decrypts_encrypted_attributes
+    plaintext = "reify me correctly"
+    post = Post.create!(a: 1, b: 2)
+    post.comments.create!(content: plaintext)
 
-    def test_fetch_reified_items_decrypts_encrypted_attributes
-      plaintext = "reify me correctly"
-      post = Post.create!(a: 1, b: 2)
-      post.comments.create!(content: plaintext)
+    snapshot = post.create_snapshot!
 
-      snapshot = post.create_snapshot!
+    _reified_post, reified_children = snapshot.fetch_reified_items
 
-      _reified_post, reified_children = snapshot.fetch_reified_items
+    reified_comment = reified_children["comments"].first
+    assert_equal plaintext, reified_comment.content
+  end
 
-      reified_comment = reified_children["comments"].first
-      assert_equal plaintext, reified_comment.content
-    end
+  def test_restore_preserves_encrypted_attribute_value
+    original_content = "original secret"
+    post = Post.create!(a: 1, b: 2)
+    comment = post.comments.create!(content: original_content)
 
-    def test_restore_preserves_encrypted_attribute_value
-      original_content = "original secret"
-      post = Post.create!(a: 1, b: 2)
-      comment = post.comments.create!(content: original_content)
+    snapshot = post.create_snapshot!
 
-      snapshot = post.create_snapshot!
+    comment.update!(content: "changed secret")
+    assert_equal "changed secret", comment.reload.content
 
-      comment.update!(content: "changed secret")
-      assert_equal "changed secret", comment.reload.content
+    snapshot.restore!
 
-      snapshot.restore!
+    comment.reload
+    assert_equal original_content, comment.content
 
-      comment.reload
-      assert_equal original_content, comment.content
+    raw_value = ActiveRecord::Base.connection.select_value(
+      "SELECT content FROM comments WHERE id = #{comment.id}"
+    )
+    refute_equal original_content, raw_value,
+      "Expected DB column to contain ciphertext after restore, not plaintext"
+  end
 
-      raw_value = ActiveRecord::Base.connection.select_value(
-        "SELECT content FROM comments WHERE id = #{comment.id}"
-      )
-      refute_equal original_content, raw_value,
-        "Expected DB column to contain ciphertext after restore, not plaintext"
-    end
+  def test_snapshot_handles_nil_encrypted_attribute
+    post = Post.create!(a: 1, b: 2)
+    comment = post.comments.create!(content: nil)
 
-    def test_snapshot_handles_nil_encrypted_attribute
-      post = Post.create!(a: 1, b: 2)
-      comment = post.comments.create!(content: nil)
+    snapshot = post.create_snapshot!
 
-      snapshot = post.create_snapshot!
+    snapshot_item = snapshot.snapshot_items.find_by(item_type: "Comment", item_id: comment.id)
+    assert_nil snapshot_item.object["content"]
 
-      snapshot_item = snapshot.snapshot_items.find_by(item_type: "Comment", item_id: comment.id)
-      assert_nil snapshot_item.object["content"]
+    _reified_post, reified_children = snapshot.fetch_reified_items
+    assert_nil reified_children["comments"].first.content
+  end
 
-      _reified_post, reified_children = snapshot.fetch_reified_items
-      assert_nil reified_children["comments"].first.content
-    end
+  def test_snapshot_backward_compat_plaintext_encrypted_attribute
+    plaintext = "old plaintext from before encryption patch"
+    post = Post.create!(a: 1, b: 2)
+    comment = post.comments.create!(content: "placeholder")
 
-    def test_snapshot_backward_compat_plaintext_encrypted_attribute
-      plaintext = "old plaintext from before encryption patch"
-      post = Post.create!(a: 1, b: 2)
-      comment = post.comments.create!(content: "placeholder")
+    snapshot = post.create_snapshot!
 
-      snapshot = post.create_snapshot!
+    snapshot_item = snapshot.snapshot_items.find_by(item_type: "Comment", item_id: comment.id)
+    obj = snapshot_item.object
+    obj["content"] = plaintext
+    snapshot_item.update!(object: obj)
 
-      snapshot_item = snapshot.snapshot_items.find_by(item_type: "Comment", item_id: comment.id)
-      obj = snapshot_item.object
-      obj["content"] = plaintext
-      snapshot_item.update!(object: obj)
-
-      _reified_post, reified_children = snapshot.fetch_reified_items
-      reified_comment = reified_children["comments"].first
-      assert_equal plaintext, reified_comment.content
-    end
-
+    _reified_post, reified_children = snapshot.fetch_reified_items
+    reified_comment = reified_children["comments"].first
+    assert_equal plaintext, reified_comment.content
   end
 
 end

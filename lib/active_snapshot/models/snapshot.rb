@@ -165,21 +165,7 @@ module ActiveSnapshot
     end
 
     def build_snapshot_item(instance, child_group_name: nil)
-      if instance.respond_to?(:attributes_for_database)
-        attrs = instance.attributes_for_database
-      else
-        # Fallback for Rails 6.x; attributes_for_database was added in Rails 7.0.
-        # This branch can be removed once Rails 6.x support is dropped.
-        attrs = instance.attributes
-
-        if instance.class.respond_to?(:defined_enums) && instance.class.defined_enums.any?
-          instance.class.defined_enums.slice(*attrs.keys).each do |enum_col_name, enum_mapping|
-            val = attrs.fetch(enum_col_name)
-            next if val.nil?
-            attrs[enum_col_name] = enum_mapping.fetch(val)
-          end
-        end
-      end
+      attrs = instance.attributes_for_database
 
       self.snapshot_items.new({
         object: attrs,
