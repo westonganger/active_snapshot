@@ -10,26 +10,26 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
     assert ActiveSnapshot::VERSION
   end
 
-  def test_deserialize_snapshot_value_decrypts_ciphertext
+  def test_get_value_decrypts_ciphertext
     comment = Comment.create!(content: "secret", post: Post.first!)
     ciphertext = comment.ciphertext_for(:content)
 
-    result = ActiveSnapshot.deserialize_snapshot_value(Comment, key: "content", value: ciphertext)
+    result = ActiveSnapshot.get_value(Comment, key: "content", value: ciphertext)
     assert_equal "secret", result
   end
 
-  def test_deserialize_snapshot_value_falls_back_for_plaintext
-    result = ActiveSnapshot.deserialize_snapshot_value(Comment, key: "content", value: "raw plaintext")
+  def test_get_value_falls_back_for_plaintext
+    result = ActiveSnapshot.get_value(Comment, key: "content", value: "raw plaintext")
     assert_equal "raw plaintext", result
   end
 
-  def test_deserialize_snapshot_value_returns_nil_for_nil
-    result = ActiveSnapshot.deserialize_snapshot_value(Comment, key: "content", value: nil)
+  def test_get_value_returns_nil_for_nil
+    result = ActiveSnapshot.get_value(Comment, key: "content", value: nil)
     assert_nil result
   end
 
-  def test_deserialize_snapshot_value_deserializes_non_encrypted
-    result = ActiveSnapshot.deserialize_snapshot_value(Post, key: "title", value: "hello")
+  def test_get_value_deserializes_non_encrypted
+    result = ActiveSnapshot.get_value(Post, key: "title", value: "hello")
     assert_equal "hello", result
   end
 

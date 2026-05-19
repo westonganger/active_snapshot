@@ -118,8 +118,8 @@ module ActiveSnapshot
         changes = {}
 
         keys.each do |key|
-          from_value = ActiveSnapshot.deserialize_snapshot_value(item_class, key: key, value: from_object[key])
-          to_value = ActiveSnapshot.deserialize_snapshot_value(item_class, key: key, value: to_object[key])
+          from_value = ActiveSnapshot.get_value(item_class, key: key, value: from_object[key])
+          to_value = ActiveSnapshot.get_value(item_class, key: key, value: to_object[key])
 
           next if to_value == from_value
 
@@ -228,7 +228,7 @@ module ActiveSnapshot
 
         si.object.each do |k,v|
           if reified_item.respond_to?("#{k}=")
-            reified_item[k] = ActiveSnapshot.deserialize_snapshot_value(item_class, key: k, value: v)
+            reified_item[k] = ActiveSnapshot.get_value(item_class, key: k, value: v)
           else
             # database column was likely dropped since the snapshot was created
           end

@@ -14,11 +14,15 @@ module ActiveSnapshot
     end
   end
 
-  def self.deserialize_snapshot_value(klass, key:, value:)
+  def self.get_value(klass, key:, value:)
     return value if value.nil?
-    klass.attribute_types[key].deserialize(value)
-  rescue ActiveRecord::Encryption::Errors::Base
-    value
+    
+    begin
+      klass.attribute_types[key].deserialize(value)
+    # handle columns which are changed from non-encrypted to encrypted
+    rescue ActiveRecord::Encryption::Errors::Base
+      value
+    end
   end
 end
 
