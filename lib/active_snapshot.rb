@@ -14,7 +14,7 @@ module ActiveSnapshot
     end
   end
 
-  def self.get_value(klass, key:, value:)
+  def self.get_deserialized_value(klass, key:, value:)
     return value if value.nil?
     
     begin

@@ -55,7 +55,7 @@ module ActiveSnapshot
 
       object.each do |k,v|
         if item.respond_to?("#{k}=")
-          item[k] = ActiveSnapshot.get_value(item.class, key: k, value: v)
+          item[k] = ActiveSnapshot.get_deserialized_value(item.class, key: k, value: v)
         else
           # database column was likely dropped since the snapshot was created
         end
