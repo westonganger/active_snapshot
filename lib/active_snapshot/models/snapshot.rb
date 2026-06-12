@@ -110,13 +110,16 @@ module ActiveSnapshot
         from_object = from ? from.object : {}
         to_object = to ? to.object : {}
 
+        item_type = (from || to).item_type
+        item_class = item_type.constantize
+
         keys = (from_object.keys + to_object.keys).uniq
 
         changes = {}
 
         keys.each do |key|
-          from_value = from_object[key]
-          to_value = to_object[key]
+          from_value = ActiveSnapshot.get_deserialized_value(item_class, key: key, value: from_object[key])
+          to_value = ActiveSnapshot.get_deserialized_value(item_class, key: key, value: to_object[key])
 
           next if to_value == from_value
 
@@ -162,15 +165,7 @@ module ActiveSnapshot
     end
 
     def build_snapshot_item(instance, child_group_name: nil)
-      attrs = instance.attributes
-
-      if instance.class.respond_to?(:defined_enums) && instance.class.defined_enums.any?
-        instance.class.defined_enums.slice(*attrs.keys).each do |enum_col_name, enum_mapping|
-          val = attrs.fetch(enum_col_name)
-          next if val.nil?
-          attrs[enum_col_name] = enum_mapping.fetch(val)
-        end
-      end
+      attrs = instance.attributes_for_database
 
       self.snapshot_items.new({
         object: attrs,
@@ -228,11 +223,12 @@ module ActiveSnapshot
       reified_parent = nil
 
       snapshot_items.each do |si|
-        reified_item = si.item_type.constantize.new
+        item_class = si.item_type.constantize
+        reified_item = item_class.new
 
         si.object.each do |k,v|
           if reified_item.respond_to?("#{k}=")
-            reified_item[k] = v
+            reified_item[k] = ActiveSnapshot.get_deserialized_value(item_class, key: k, value: v)
           else
             # database column was likely dropped since the snapshot was created
           end

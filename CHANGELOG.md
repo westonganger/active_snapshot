@@ -3,7 +3,9 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.1.0...master)
-  * Nothing yet
+  * [#80](https://github.com/westonganger/active_snapshot/pull/80)
+    * Encrypted fields are now also encrypted in snapshots.
+    * Drop support for rails < 7.0
 
 - **v1.1.0** - Dec 28 2025
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.0.0...v1.1.0)
