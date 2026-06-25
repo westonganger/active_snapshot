@@ -16,11 +16,11 @@ module ActiveSnapshot
 
   def self.get_deserialized_value(klass, key:, value:)
     return value if value.nil?
-    
+
     begin
       klass.attribute_types[key].deserialize(value)
-    # handle columns which are changed from non-encrypted to encrypted
     rescue ActiveRecord::Encryption::Errors::Base
+      # handle columns which are changed from non-encrypted to encrypted
       value
     end
   end
