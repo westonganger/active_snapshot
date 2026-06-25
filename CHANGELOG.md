@@ -2,7 +2,11 @@ CHANGELOG
 ---------
 
 - **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.1.0...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.2.0...master)
+  * Nothing yet
+
+- **v1.2.0** - Jun 25, 2026
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.1.0...v1.2.0)
   * [#80](https://github.com/westonganger/active_snapshot/pull/80)
     * Encrypted fields are now also encrypted in snapshots.
     * Drop support for rails < 7.0
