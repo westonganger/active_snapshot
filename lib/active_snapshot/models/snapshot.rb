@@ -165,7 +165,13 @@ module ActiveSnapshot
     end
 
     def build_snapshot_item(instance, child_group_name: nil)
-      attrs = instance.attributes_for_database
+      attrs = instance.attributes_for_database.transform_values do |value|
+        if value.try(:encoder).is_a?(PG::TextEncoder::Array)
+          value.values
+        else
+          value
+        end
+      end
 
       self.snapshot_items.new({
         object: attrs,

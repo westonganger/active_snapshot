@@ -88,6 +88,16 @@ class SnapshotTest < ActiveSupport::TestCase
     @snapshot.build_snapshot_item(Post.first, child_group_name: :foobar)
   end
 
+  def test_build_snapshot_item_handles_enum_array_column
+    skip "requires pg gem" unless defined?(PG)
+
+    @snapshot = @snapshot_klass.first
+
+    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+
+    assert_equal ["foo", "bar"], snapshot_item.object["enum_array"]
+  end
+
   def test_snapshot_item_stores_enum_column_database_value
     assert Post.defined_enums.has_key?("status")
 

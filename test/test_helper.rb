@@ -53,7 +53,11 @@ ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __d
 
 require "rspec/mocks/minitest_integration"
 
-post = Post.create!(a: 1, b: 3)
+post = if defined?(PG)
+  Post.create!(a: 1, b: 3, enum_array: ["foo", "bar"])
+else
+  Post.create!(a: 1, b: 3)
+end
 post.create_snapshot!(identifier: 'v1')
 post.update_columns(a: 2, b: 4)
 post.create_snapshot!(identifier: 'v2')
