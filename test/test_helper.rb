@@ -54,7 +54,13 @@ ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __d
 require "rspec/mocks/minitest_integration"
 
 post = if defined?(PG)
-  Post.create!(a: 1, b: 3, enum_array: ["foo", "bar"])
+  Post.create!(
+    a: 1,
+    b: 3,
+    text_array: ["foo", "bar"],
+    integer_array: [1, 2],
+    enum_array: ["foo", "bar"]
+  )
 else
   Post.create!(a: 1, b: 3)
 end

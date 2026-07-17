@@ -11,6 +11,8 @@ class SetUpTestTables < ActiveRecord::Migration::Current
       t.integer :status, default: 0
 
       if connection.adapter_name == "PostgreSQL"
+        t.text :text_array, array: true
+        t.integer :integer_array, array: true
         t.enum :enum_array, enum_type: :post_enum_array, array: true
       end
 
