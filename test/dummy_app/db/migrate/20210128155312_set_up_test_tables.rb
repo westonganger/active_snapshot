@@ -1,10 +1,20 @@
 class SetUpTestTables < ActiveRecord::Migration::Current
 
   def change
+    if connection.adapter_name == "PostgreSQL"
+      create_enum :post_enum_array, ["foo", "bar"]
+    end
+
     create_table :posts do |t|
       t.integer :a, :b
 
       t.integer :status, default: 0
+
+      if connection.adapter_name == "PostgreSQL"
+        t.text :text_array, array: true
+        t.integer :integer_array, array: true
+        t.enum :enum_array, enum_type: :post_enum_array, array: true
+      end
 
       t.timestamps
     end
