@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.2.0...master)
-  * Properly serialize PostgreSQL array columns to a JSON array
+  * [#82](https://github.com/westonganger/active_snapshot/pull/82) - Properly serialize PostgreSQL array columns
 
 - **v1.2.0** - Jun 25, 2026
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.1.0...v1.2.0)
