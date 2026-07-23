@@ -3,16 +3,15 @@ require "test_helper"
 class SnapshotTest < ActiveSupport::TestCase
 
   def setup
-    @snapshot_klass = ActiveSnapshot::Snapshot
   end
 
   def teardown
   end
 
   def test_relationships
-    shared_post = Post.first!
+    post = Post.create!(a: 1, b: 3)
 
-    instance = @snapshot_klass.new
+    instance = ActiveSnapshot::Snapshot.new
 
     assert instance.user.nil?
     assert instance.item.nil?
@@ -31,17 +30,17 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_not instance.item.nil?
     assert_not instance.snapshot_items.empty?
 
-    instance = @snapshot_klass.new(item: shared_post, user: shared_post)
+    instance = ActiveSnapshot::Snapshot.new(item: post, user: post)
 
-    assert instance.item.id, shared_post.id
-    assert instance.user.id, shared_post.id
+    assert instance.item.id, post.id
+    assert instance.user.id, post.id
   end
 
   def test_validations
-    shared_post = Post.first!
-    snapshot = shared_post.snapshots.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    instance = @snapshot_klass.new
+    instance = ActiveSnapshot::Snapshot.new
 
     instance.valid?
 
@@ -49,51 +48,60 @@ class SnapshotTest < ActiveSupport::TestCase
       assert instance.errors[attr].present? ### presence error
     end
 
-    instance = @snapshot_klass.new(item: snapshot.item, identifier: snapshot.identifier)
+    instance = ActiveSnapshot::Snapshot.new(item: snapshot.item, identifier: snapshot.identifier)
 
     instance.valid?
 
     assert instance.errors[:identifier].present? ### uniq error
 
-    instance = @snapshot_klass.new(item: snapshot.item, identifier: 'random')
+    instance = ActiveSnapshot::Snapshot.new(item: snapshot.item, identifier: 'random')
 
     assert instance.valid?
   end
 
   def test_metadata
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    assert @snapshot.metadata.is_a?(Hash)
+    assert snapshot.metadata.is_a?(Hash)
 
-    @snapshot.metadata = {foo: :bar}
+    snapshot.metadata = {foo: :bar}
 
     if ActiveSnapshot.config.storage_method_yaml?
-      assert_equal :bar, @snapshot.metadata.fetch(:foo)
+      assert_equal :bar, snapshot.metadata.fetch(:foo)
     else
-      assert_equal "bar", @snapshot.metadata.fetch("foo")
+      assert_equal "bar", snapshot.metadata.fetch("foo")
     end
   end
 
   def test_build_snapshot_item
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+    snapshot_item = snapshot.build_snapshot_item(Post.create!(a: 1, b: 3))
 
     assert snapshot_item.is_a?(ActiveSnapshot::SnapshotItem)
 
     assert snapshot_item.new_record?
 
-    assert_equal @snapshot.id, snapshot_item.snapshot_id
+    assert_equal snapshot.id, snapshot_item.snapshot_id
 
-    @snapshot.build_snapshot_item(Post.first, child_group_name: :foobar)
+    snapshot.build_snapshot_item(Post.create!(a: 1, b: 3), child_group_name: :foobar)
   end
 
   def test_build_snapshot_item_handles_text_array_column
     skip "requires pg gem" unless defined?(PG)
 
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(
+      a: 1,
+      b: 3,
+      text_array: ["foo", "bar"],
+      integer_array: [1, 2],
+      enum_array: ["foo", "bar"]
+    )
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+    snapshot_item = snapshot.build_snapshot_item(Post.create!(a: 1, b: 3))
 
     assert_equal ["foo", "bar"], snapshot_item.object["text_array"]
   end
@@ -101,9 +109,16 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_build_snapshot_item_handles_integer_array_column
     skip "requires pg gem" unless defined?(PG)
 
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(
+      a: 1,
+      b: 3,
+      text_array: ["foo", "bar"],
+      integer_array: [1, 2],
+      enum_array: ["foo", "bar"]
+    )
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+    snapshot_item = snapshot.build_snapshot_item(Post.create!(a: 1, b: 3))
 
     assert_equal [1, 2], snapshot_item.object["integer_array"]
   end
@@ -111,9 +126,16 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_build_snapshot_item_handles_enum_array_column
     skip "requires pg gem" unless defined?(PG)
 
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(
+      a: 1,
+      b: 3,
+      text_array: ["foo", "bar"],
+      integer_array: [1, 2],
+      enum_array: ["foo", "bar"]
+    )
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    snapshot_item = @snapshot.build_snapshot_item(Post.first)
+    snapshot_item = snapshot.build_snapshot_item(Post.create!(a: 1, b: 3))
 
     assert_equal ["foo", "bar"], snapshot_item.object["enum_array"]
   end
@@ -121,7 +143,7 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_snapshot_item_stores_enum_column_database_value
     assert Post.defined_enums.has_key?("status")
 
-    post = Post.first
+    post = Post.create!(a: 1, b: 3)
 
     enum_mapping = post.class.defined_enums.fetch("status")
 
@@ -140,7 +162,7 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_snapshot_item_handles_nil_enum_column_value
     assert Post.defined_enums.has_key?("status")
 
-    post = Post.first
+    post = Post.create!(a: 1, b: 3)
 
     enum_mapping = post.class.defined_enums.fetch("status")
 
@@ -158,9 +180,11 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_snapshot_item_handles_enum_values_from_select_statement
     assert Post.defined_enums.has_key?("status")
 
-    assert_equal "draft", Post.first.status
+    assert_equal "draft", Post.create!(a: 1, b: 3).status
 
-    post = Post.select(:id).first
+    Post.create!(a: 1, b: 3)
+
+    post = Post.select(:id).first!
 
     snapshot = post.create_snapshot!(identifier: "enum-test")
 
@@ -172,17 +196,19 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_restore
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
     assert_nothing_raised do
-      @snapshot.restore!
+      snapshot.restore!
     end
   end
 
   def test_fetch_reified_items_with_readonly
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    reified_items = @snapshot.fetch_reified_items
+    reified_items = snapshot.fetch_reified_items
 
     assert reified_items.is_a?(Array)
 
@@ -196,9 +222,10 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_fetch_reified_items_without_readonly
-    @snapshot = @snapshot_klass.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    reified_items = @snapshot.fetch_reified_items(readonly: false)
+    reified_items = snapshot.fetch_reified_items(readonly: false)
 
     assert reified_items.is_a?(Array)
 
@@ -220,8 +247,7 @@ class SnapshotTest < ActiveSupport::TestCase
     note_body = 'Example note'
     post.notes.create!(body: note_body)
 
-    post.create_snapshot!(identifier: 'v1')
-    snapshot = post.snapshots.first
+    snapshot = post.create_snapshot!(identifier: 'v1')
 
     reified_post, reified_children = snapshot.fetch_reified_items
 
@@ -242,8 +268,7 @@ class SnapshotTest < ActiveSupport::TestCase
     note_body = 'Example note'
     post.notes.create!(body: note_body)
 
-    post.create_snapshot!(identifier: 'v1')
-    snapshot = post.snapshots.first
+    snapshot = post.create_snapshot!(identifier: 'v1')
 
     reified_post, reified_children = snapshot.fetch_reified_items
 
@@ -265,8 +290,7 @@ class SnapshotTest < ActiveSupport::TestCase
     note_body = 'Example note'
     post.notes.create!(body: note_body)
 
-    post.create_snapshot!(identifier: 'v1')
-    snapshot = post.snapshots.first
+    snapshot = post.create_snapshot!(identifier: 'v1')
 
     reified_post, reified_children = snapshot.fetch_reified_items
 
@@ -277,9 +301,10 @@ class SnapshotTest < ActiveSupport::TestCase
   end
 
   def test_fetch_reified_items_handles_dropped_columns!
-    snapshot = @snapshot_klass.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    snapshot_item = snapshot.snapshot_items.first
+    snapshot_item = snapshot.snapshot_items.first!
 
     attrs = snapshot_item.object
     attrs["foo"] = "bar"
@@ -330,8 +355,7 @@ class SnapshotTest < ActiveSupport::TestCase
       assignee: user,
     )
 
-    task.create_snapshot!
-    snapshot = task.snapshots.first
+    snapshot = task.create_snapshot!
 
     items = snapshot.snapshot_items.order(:id)
     assert_equal ["Task", "User", "User"], items.map(&:item_type)

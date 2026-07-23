@@ -3,15 +3,13 @@ require "test_helper"
 class SnapshotItemTest < ActiveSupport::TestCase
 
   def setup
-    @snapshot_klass = ActiveSnapshot::Snapshot
-    @snapshot_item_klass = ActiveSnapshot::SnapshotItem
   end
 
   def teardown
   end
 
   def test_relationships
-    instance = @snapshot_item_klass.new
+    instance = ActiveSnapshot::SnapshotItem.new
 
     assert instance.snapshot.nil?
     assert instance.item.nil?
@@ -20,7 +18,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
       instance.snapshot = instance
     end
 
-    instance.snapshot = @snapshot_klass.new
+    instance.snapshot = ActiveSnapshot::Snapshot.new
 
     instance.item = instance
 
@@ -29,7 +27,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
   end
 
   def test_validations
-    instance = @snapshot_item_klass.new
+    instance = ActiveSnapshot::SnapshotItem.new
 
     assert instance.invalid?
 
@@ -37,10 +35,10 @@ class SnapshotItemTest < ActiveSupport::TestCase
       assert_equal ["can't be blank"], instance.errors[attr] ### presence error
     end
 
-    post = Post.first!
-    snapshot = post.snapshots.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
 
-    instance = @snapshot_item_klass.new(item: snapshot.item, snapshot: snapshot)
+    instance = ActiveSnapshot::SnapshotItem.new(item: snapshot.item, snapshot: snapshot)
 
     assert instance.invalid?
 
@@ -48,31 +46,31 @@ class SnapshotItemTest < ActiveSupport::TestCase
   end
 
   def test_object
-    @snapshot = @snapshot_klass.includes(:snapshot_items).first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
+    snapshot_item = snapshot.snapshot_items.first!
 
-    @snapshot_item = @snapshot.snapshot_items.first
+    assert snapshot_item.object.is_a?(Hash)
 
-    assert @snapshot_item.object.is_a?(Hash)
+    snapshot_item.object = {foo: :bar}
 
-    @snapshot_item.object = {foo: :bar}
-
-    assert 'bar', @snapshot_item.object['foo']
+    assert 'bar', snapshot_item.object['foo']
   end
 
   def test_restore_item!
-    @snapshot = @snapshot_klass.includes(:snapshot_items).first
-
-    @snapshot_item = @snapshot.snapshot_items.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
+    snapshot_item = snapshot.snapshot_items.first!
 
     assert_nothing_raised do
-      @snapshot_item.restore_item!
+      snapshot_item.restore_item!
     end
   end
 
   def test_restore_item_handles_dropped_columns!
-    snapshot = @snapshot_klass.includes(:snapshot_items).first
-
-    snapshot_item = snapshot.snapshot_items.first
+    post = Post.create!(a: 1, b: 3)
+    snapshot = post.create_snapshot!(identifier: "v1")
+    snapshot_item = snapshot.snapshot_items.first!
 
     attrs = snapshot_item.object
     attrs["foo"] = "bar"

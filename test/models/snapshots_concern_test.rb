@@ -31,21 +31,21 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   end
 
   def test_create_snapshot!
-    @post = Post.first
+    post = Post.create!(a: 1, b: 3)
 
-    #@user = User.first
+    user = User.create!
 
-    snapshot = @post.create_snapshot!(identifier: "foobar 1", user: @user, metadata: {foo: :bar})
+    snapshot = post.create_snapshot!(identifier: "foobar 1", user: user, metadata: {foo: :bar})
     assert_not snapshot.new_record?
 
-    snapshot = @post.create_snapshot!(identifier: "foobar 2", user: @user)
+    snapshot = post.create_snapshot!(identifier: "foobar 2", user: user)
     assert_not snapshot.new_record?
 
-    snapshot = @post.create_snapshot!(identifier: "foobar 3")
+    snapshot = post.create_snapshot!(identifier: "foobar 3")
     assert_not snapshot.new_record?
 
     assert_raise do
-      @post.create_snapshot!(identifier: "foobar 3")
+      post.create_snapshot!(identifier: "foobar 3")
     end
   end
 
@@ -116,7 +116,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   end
 
   def test_optional_identifier
-    post = Post.first
+    post = Post.create!(a: 1, b: 3)
 
     assert_difference ->{ ActiveSnapshot::Snapshot.count }, 2 do
       post.create_snapshot!
@@ -125,7 +125,7 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   end
 
   def test_create_snapshot_returns_valid_snapshot
-    post = Post.first
+    post = Post.create!(a: 1, b: 3)
 
     snapshot = post.create_snapshot!
 

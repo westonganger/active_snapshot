@@ -11,7 +11,8 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
   end
 
   def test_get_deserialized_value_decrypts_ciphertext
-    comment = Comment.create!(content: "secret", post: Post.first!)
+    post = Post.create!(a: 1, b: 3)
+    comment = post.comments.create!(content: "secret")
     ciphertext = comment.ciphertext_for(:content)
 
     result = ActiveSnapshot.get_deserialized_value(Comment, key: "content", value: ciphertext)
@@ -36,18 +37,18 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
   def test_snapshot_lifecycle
     identifier = "snapshot-1"
 
-    klass = Post
-
-    parent = klass.first
+    parent = Post.create!(a: 1, b: 3)
 
     original_parent_updated_at = parent.updated_at
 
     child = parent.comments.create!(content: :foo)
     original_child_updated_at = child.updated_at
 
+    snapshot = nil
+
     assert_difference ->{ ActiveSnapshot::Snapshot.count }, 1 do
       assert_difference ->{ ActiveSnapshot::SnapshotItem.count }, 2 do
-        @snapshot = parent.create_snapshot!(identifier: identifier)
+        snapshot = parent.create_snapshot!(identifier: identifier)
       end
     end
 
@@ -62,7 +63,7 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
 
     assert_no_difference ->{ ActiveSnapshot::Snapshot.count } do
       assert_no_difference ->{ ActiveSnapshot::SnapshotItem.count } do
-        @snapshot.restore!
+        snapshot.restore!
       end
     end
 
@@ -72,7 +73,7 @@ class ActiveSnapshotTest < ActiveSupport::TestCase
 
     assert_equal 1, parent.children_to_snapshot[:comments][:records].count
 
-    ### Test Data Chang
+    ### Test Data Change
     assert_time_match original_parent_updated_at, parent.updated_at
     assert_time_match original_child_updated_at, parent.children_to_snapshot[:comments][:records].first.updated_at
   end

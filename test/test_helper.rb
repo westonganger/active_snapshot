@@ -51,6 +51,9 @@ require "minitest/autorun"
 # Run any available migration
 ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __dir__)).migrate
 
+# Ensure schema.rb is updated
+ActiveRecord::Migration.maintain_test_schema!
+
 require "rspec/mocks/minitest_integration"
 
 post = if defined?(PG)
@@ -61,12 +64,7 @@ post = if defined?(PG)
     integer_array: [1, 2],
     enum_array: ["foo", "bar"]
   )
-else
-  Post.create!(a: 1, b: 3)
 end
-post.create_snapshot!(identifier: 'v1')
-post.update_columns(a: 2, b: 4)
-post.create_snapshot!(identifier: 'v2')
 
 def assert_time_match(a, b)
   format = "%d-%m-%Y %h:%M:%S.%L" ### MUST LIMIT THE MILLISECONDS TO 3 decimal places of accuracy, the rest are dropped
