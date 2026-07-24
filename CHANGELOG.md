@@ -2,7 +2,11 @@ CHANGELOG
 ---------
 
 - **Unreleased**
-  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.2.0...master)
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.2.1...master)
+  * Nothing yet
+
+- **v1.2.1** - July 24, 2026
+  * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.2.0...v1.2.1)
   * [#82](https://github.com/westonganger/active_snapshot/pull/82) - Properly serialize PostgreSQL array columns
 
 - **v1.2.0** - Jun 25, 2026
