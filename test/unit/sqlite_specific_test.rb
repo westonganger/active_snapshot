@@ -10,7 +10,7 @@ class SqliteSpecificTest < ActiveSupport::TestCase
         time_field: (Time.parse("2026-07-04 04:05:06") if !ActiveSnapshot.config.storage_method_yaml?),
         timestamp_field: Time.parse("2026-08-05 01:02:03"),
         json_field: {string: "bar", number: 2, array: [1,2,3]},
-        #binary_field: "0010010", # binary fields have issues currently
+        binary_field: "0010010",
         boolean_field: true,
       )
 
@@ -33,7 +33,7 @@ class SqliteSpecificTest < ActiveSupport::TestCase
           integer_field: 2,
           date_field: Date.parse("2026-06-03"),
           json_field: {"string" => "bar", "number" => 2, "array" => [1,2,3]},
-          binary_field: nil,
+          binary_field: "0010010",
           boolean_field: true,
         },
         snapshot_item.item.attributes.symbolize_keys.except(:id, :time_field, :timestamp_field)
@@ -56,7 +56,7 @@ class SqliteSpecificTest < ActiveSupport::TestCase
         time_field: (Time.parse("2026-07-04 07:08:09") if !ActiveSnapshot.config.storage_method_yaml?),
         timestamp_field: Time.parse("2026-03-05 04:05:06"),
         json_field: {string: "foo", number: 1, array: [4,5,6]},
-        #binary_field: "0101010101",
+        binary_field: "0101010101",
         boolean_field: false,
       )
 
@@ -66,7 +66,7 @@ class SqliteSpecificTest < ActiveSupport::TestCase
       assert_equal([2,3], diff.first[:changes][:integer_field])
       assert_equal([Date.parse("2026-06-03"), Date.parse("2026-01-03")], diff.first[:changes][:date_field])
       assert_equal([{"string" => "bar", "number" => 2, "array" => [1, 2, 3]}, {"string" => "foo", "number" => 1, "array" => [4, 5, 6]}], diff.first[:changes][:json_field])
-      #assert_equal([nil, {"value" => "0101010101"}], diff.first[:changes][:binary_field])
+      assert_equal(["0010010", "0101010101"], diff.first[:changes][:binary_field])
       assert_equal([true, false], diff.first[:changes][:boolean_field])
 
       assert_time_match(Time.parse("2026-08-05 01:02:03"), diff.first[:changes][:timestamp_field].first)
