@@ -9,7 +9,7 @@ class PostgresSpecificTest < ActiveSupport::TestCase
         date_field: Date.parse("2026-06-03"),
         time_field: (Time.parse("2026-07-04 04:05:06") if !ActiveSnapshot.config.storage_method_yaml?),
         timestamp_field: Time.parse("2026-08-05 01:02:03"),
-        #binary_field: "0010010", # binary fields have issues currently
+        binary_field: "0010010",
         boolean_field: true,
         json_field: {string: "bar", number: 2, array: [1,2,3]},
         jsonb_field: {string: "baz", number: 3, array: [2,3,4]},
@@ -17,7 +17,7 @@ class PostgresSpecificTest < ActiveSupport::TestCase
         cidr_field: "192.168.10.0/24",
         mac_field: "08:00:2b:01:02:03",
         uuid_field: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-        #bit_field: "00001111", #bit fields have issues currently
+        bit_field: "00001111",
         money_field: BigDecimal("49.99"),
         text_array_field: ["a","b","c"],
         integer_array_field: [1,2,3],
@@ -44,14 +44,14 @@ class PostgresSpecificTest < ActiveSupport::TestCase
           integer_field: 2,
           date_field: Date.parse("2026-06-03"),
           boolean_field: true,
-          binary_field: nil,
+          binary_field: "0010010",
           json_field: {"string" => "bar", "number" => 2, "array" => [1,2,3]},
           jsonb_field: {"string" => "baz", "number" => 3, "array" => [2,3,4]},
           inet_field: IPAddr.new("192.168.1.55"),
           cidr_field: IPAddr.new("192.168.10.0/24"),
           mac_field: "08:00:2b:01:02:03",
           uuid_field: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-          bit_field: nil,
+          bit_field: "00001111",
           money_field: BigDecimal("49.99"),
           text_array_field: ["a","b","c"],
           integer_array_field: [1,2,3],
@@ -78,14 +78,14 @@ class PostgresSpecificTest < ActiveSupport::TestCase
         time_field: (Time.parse("2026-07-04 07:08:09") if !ActiveSnapshot.config.storage_method_yaml?),
         timestamp_field: Time.parse("2026-03-05 04:05:06"),
         json_field: {string: "foo", number: 1, array: [4,5,6]},
-        #binary_field: "0101010101",
+        binary_field: "0101010101",
         boolean_field: false,
         jsonb_field: {string: "baz2", number: 4, array: [5,2,3,4]},
         inet_field: "192.168.1.52",
         cidr_field: "192.168.9.0/24",
         mac_field: "08:00:2b:01:02:04",
         uuid_field: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12",
-        #bit_field: "00011111",
+        bit_field: "00011111",
         money_field: BigDecimal("39.99"),
         text_array_field: ["a","b","d"],
         integer_array_field: [1,2,4],
@@ -101,7 +101,7 @@ class PostgresSpecificTest < ActiveSupport::TestCase
       assert_equal([2,3], diff.first[:changes][:integer_field])
       assert_equal([Date.parse("2026-06-03"), Date.parse("2026-01-03")], diff.first[:changes][:date_field])
       assert_equal([{"string" => "bar", "number" => 2, "array" => [1, 2, 3]}, {"string" => "foo", "number" => 1, "array" => [4, 5, 6]}], diff.first[:changes][:json_field])
-      #assert_equal([nil, {"value" => "0101010101"}], diff.first[:changes][:binary_field])
+      assert_equal(["0010010", "0101010101"], diff.first[:changes][:binary_field])
       assert_equal([true, false], diff.first[:changes][:boolean_field])
       assert_equal(["bar", "foo"], diff.first[:changes][:enum_field])
       assert_equal([{"string"=>"baz", "number"=>3, "array"=>[2, 3, 4]}, {"string"=>"baz2", "number"=>4, "array"=>[5, 2, 3, 4]}], diff.first[:changes][:jsonb_field])
@@ -109,7 +109,7 @@ class PostgresSpecificTest < ActiveSupport::TestCase
       assert_equal([IPAddr.new("192.168.10.0/24"), IPAddr.new("192.168.9.0/24")], diff.first[:changes][:cidr_field])
       assert_equal(["08:00:2b:01:02:03", "08:00:2b:01:02:04"], diff.first[:changes][:mac_field])
       assert_equal(["a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"], diff.first[:changes][:uuid_field])
-      #assert_equal(["", ""], diff.first[:changes][:bit_field])
+      assert_equal(["00001111", "00011111"], diff.first[:changes][:bit_field])
       assert_equal([BigDecimal("49.99"), BigDecimal("39.99")], diff.first[:changes][:money_field])
       assert_equal([["a", "b", "c"], ["a", "b", "d"]], diff.first[:changes][:text_array_field])
       assert_equal([[1, 2, 3], [1, 2, 4]], diff.first[:changes][:integer_array_field])
