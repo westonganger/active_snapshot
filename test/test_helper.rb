@@ -1,5 +1,6 @@
 #$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 ENV["RAILS_ENV"] = "test"
+ENV['TZ'] = "UTC"
 
 require "active_support/all"
 
@@ -28,6 +29,13 @@ Pathname.new(__dir__).join("dummy_app/db").glob("*sqlite*").each(&:delete)
 ### Instantiates Rails
 require File.expand_path("../dummy_app/config/environment.rb",  __FILE__)
 
+require 'active_record/tasks/database_tasks'
+db_config = ActiveRecord::Base.configurations.configs_for(env_name: ENV["RAILS_ENV"]).first
+ActiveRecord::Tasks::DatabaseTasks.drop(db_config.configuration_hash) rescue nil
+ActiveRecord::Tasks::DatabaseTasks.create(db_config.configuration_hash)
+ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __dir__)).migrate
+ActiveRecord::Tasks::DatabaseTasks.dump_schema(db_config, :ruby)
+
 require "rails/test_help"
 
 class ActiveSupport::TestCase
@@ -47,12 +55,6 @@ Minitest::Reporters.use!(
 )
 
 require "minitest/autorun"
-
-# Run any available migration
-ActiveRecord::MigrationContext.new(File.expand_path("dummy_app/db/migrate/", __dir__)).migrate
-
-# Ensure schema.rb is updated
-ActiveRecord::Migration.maintain_test_schema!
 
 require "rspec/mocks/minitest_integration"
 
