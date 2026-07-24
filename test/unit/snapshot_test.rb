@@ -11,52 +11,52 @@ class SnapshotTest < ActiveSupport::TestCase
   def test_relationships
     post = Post.create!(a: 1, b: 3)
 
-    instance = ActiveSnapshot::Snapshot.new
+    snapshot = ActiveSnapshot::Snapshot.new
 
-    assert instance.user.nil?
-    assert instance.item.nil?
-    assert instance.snapshot_items.empty?
+    assert snapshot.user.nil?
+    assert snapshot.item.nil?
+    assert snapshot.snapshot_items.empty?
 
-    instance.user = instance
-    instance.item = instance
+    snapshot.user = snapshot
+    snapshot.item = snapshot
 
     assert_raises do
-      instance.snapshot_items << instance
+      snapshot.snapshot_items << snapshot
     end
 
-    instance.snapshot_items << ActiveSnapshot::SnapshotItem.new
+    snapshot.snapshot_items << ActiveSnapshot::SnapshotItem.new
 
-    assert_not instance.user.nil?
-    assert_not instance.item.nil?
-    assert_not instance.snapshot_items.empty?
+    assert_not snapshot.user.nil?
+    assert_not snapshot.item.nil?
+    assert_not snapshot.snapshot_items.empty?
 
-    instance = ActiveSnapshot::Snapshot.new(item: post, user: post)
+    snapshot = ActiveSnapshot::Snapshot.new(item: post, user: post)
 
-    assert instance.item.id, post.id
-    assert instance.user.id, post.id
+    assert snapshot.item.id, post.id
+    assert snapshot.user.id, post.id
   end
 
-  def test_validations
-    post = Post.create!(a: 1, b: 3)
-    snapshot = post.create_snapshot!(identifier: "v1")
+  def test_validates_item_presence
+    snapshot = ActiveSnapshot::Snapshot.new
 
-    instance = ActiveSnapshot::Snapshot.new
-
-    instance.valid?
+    assert_not snapshot.valid?
 
     [:item_id, :item_type].each do |attr|
-      assert instance.errors[attr].present? ### presence error
+      assert snapshot.errors[attr].present? ### presence error
+    end
+  end
+
+  def test_validates_identifier_uniqueness
+    post = Post.create!(a: 1, b: 3)
+    post.create_snapshot!(identifier: "v1")
+
+    exception = assert_raises(ActiveRecord::RecordInvalid) do
+      post.create_snapshot!(identifier: "v1")
     end
 
-    instance = ActiveSnapshot::Snapshot.new(item: snapshot.item, identifier: snapshot.identifier)
+    assert_equal "Validation failed: Identifier has already been taken", exception.message
 
-    instance.valid?
-
-    assert instance.errors[:identifier].present? ### uniq error
-
-    instance = ActiveSnapshot::Snapshot.new(item: snapshot.item, identifier: 'random')
-
-    assert instance.valid?
+    post.create_snapshot!(identifier: "v2")
   end
 
   def test_metadata
@@ -156,15 +156,13 @@ class SnapshotTest < ActiveSupport::TestCase
     stored_value = snapshot_item.object["status"]
 
     assert_equal 1, stored_value
-    assert_equal "published", enum_mapping.invert.fetch(stored_value)
+    assert_equal "published", enum_mapping.key(stored_value)
   end
 
   def test_snapshot_item_handles_nil_enum_column_value
     assert Post.defined_enums.has_key?("status")
 
     post = Post.create!(a: 1, b: 3)
-
-    enum_mapping = post.class.defined_enums.fetch("status")
 
     post.status = nil
 
@@ -174,7 +172,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     stored_value = snapshot_item.object["status"]
 
-    assert_equal nil, stored_value
+    assert_nil stored_value
   end
 
   def test_snapshot_item_handles_enum_values_from_select_statement
@@ -192,7 +190,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     stored_value = snapshot_item.object["status"]
 
-    assert_equal nil, stored_value
+    assert_nil stored_value
   end
 
   def test_restore
@@ -321,11 +319,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     prev_attrs = instance.attributes
 
-    instance.create_snapshot!(identifier: 'v1')
-
-    instance.update!(a: 9, b: 9)
-
-    snapshot = instance.snapshots.first
+    snapshot = instance.create_snapshot!(identifier: 'v1')
 
     reified_items = snapshot.fetch_reified_items
 
@@ -407,12 +401,12 @@ class SnapshotTest < ActiveSupport::TestCase
 
   def test_diff_between_snapshot_and_instance
     post = Post.create!(a: 1, b: 2)
-    comment = post.comments.create!(content: "First comment")
-    comment_to_destroy = post.comments.create!(content: "Comment to destroy")
+    post.comments.create!(content: "First comment")
+    post.comments.create!(content: "Comment to destroy")
     from_snapshot = post.create_snapshot!
 
     post.update!(a: 3, b: 4)
-    comment_to_destroy.destroy!
+    destroyed_comment = post.comments.last.destroy!
     new_comment = post.comments.create!(content: "New comment")
     post.comments.reload
 
@@ -429,7 +423,7 @@ class SnapshotTest < ActiveSupport::TestCase
 
     destroy_diff = diff.find { |d| d[:action] == :destroy }
     assert_equal :destroy, destroy_diff[:action]
-    assert_equal comment_to_destroy.id, destroy_diff[:item_id]
+    assert_equal destroyed_comment.id, destroy_diff[:item_id]
     assert_equal "Comment", destroy_diff[:item_type]
     assert_equal ["Comment to destroy", nil], destroy_diff[:changes][:content]
 

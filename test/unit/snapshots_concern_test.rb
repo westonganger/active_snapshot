@@ -9,25 +9,25 @@ class SnapshotsConcernTest < ActiveSupport::TestCase
   end
 
   def test_relationships
-    instance = Post.new
+    post = Post.new
 
-    assert instance.snapshots.empty?
-    assert instance.snapshot_items.empty?
-
-    assert_raises do
-      instance.snapshots << instance
-    end
-
-    instance.snapshots << ActiveSnapshot::Snapshot.new
+    assert post.snapshots.empty?
+    assert post.snapshot_items.empty?
 
     assert_raises do
-      instance.snapshot_items << instance
+      post.snapshots << post
     end
 
-    instance.snapshot_items << ActiveSnapshot::SnapshotItem.new
+    post.snapshots << ActiveSnapshot::Snapshot.new
 
-    assert_not instance.snapshots.empty?
-    assert_not instance.snapshot_items.empty?
+    assert_raises do
+      post.snapshot_items << post
+    end
+
+    post.snapshot_items << ActiveSnapshot::SnapshotItem.new
+
+    assert_not post.snapshots.empty?
+    assert_not post.snapshot_items.empty?
   end
 
   def test_create_snapshot!

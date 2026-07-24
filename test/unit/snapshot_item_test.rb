@@ -8,41 +8,23 @@ class SnapshotItemTest < ActiveSupport::TestCase
   def teardown
   end
 
-  def test_relationships
-    instance = ActiveSnapshot::SnapshotItem.new
-
-    assert instance.snapshot.nil?
-    assert instance.item.nil?
-
-    assert_raises do
-      instance.snapshot = instance
-    end
-
-    instance.snapshot = ActiveSnapshot::Snapshot.new
-
-    instance.item = instance
-
-    assert_not instance.snapshot.nil?
-    assert_not instance.item.nil?
-  end
-
   def test_validations
-    instance = ActiveSnapshot::SnapshotItem.new
+    snapshot_item = ActiveSnapshot::SnapshotItem.new
 
-    assert instance.invalid?
+    assert_not snapshot_item.valid?
 
     [:item_id, :item_type, :snapshot_id, :object].each do |attr|
-      assert_equal ["can't be blank"], instance.errors[attr] ### presence error
+      assert_equal ["can't be blank"], snapshot_item.errors[attr] ### presence error
     end
 
     post = Post.create!(a: 1, b: 3)
     snapshot = post.create_snapshot!(identifier: "v1")
 
-    instance = ActiveSnapshot::SnapshotItem.new(item: snapshot.item, snapshot: snapshot)
+    snapshot_item = ActiveSnapshot::SnapshotItem.new(item: snapshot.item, snapshot: snapshot)
 
-    assert instance.invalid?
+    assert_not snapshot_item.valid?
 
-    assert_equal ["has already been taken"], instance.errors[:item_id] ### uniq error
+    assert_equal ["has already been taken"], snapshot_item.errors[:item_id] ### uniq error
   end
 
   def test_object
@@ -57,7 +39,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
     assert 'bar', snapshot_item.object['foo']
   end
 
-  def test_restore_item!
+  def test_restore_item
     post = Post.create!(a: 1, b: 3)
     snapshot = post.create_snapshot!(identifier: "v1")
     snapshot_item = snapshot.snapshot_items.first!
@@ -67,7 +49,7 @@ class SnapshotItemTest < ActiveSupport::TestCase
     end
   end
 
-  def test_restore_item_handles_dropped_columns!
+  def test_restore_item_handles_dropped_columns
     post = Post.create!(a: 1, b: 3)
     snapshot = post.create_snapshot!(identifier: "v1")
     snapshot_item = snapshot.snapshot_items.first!

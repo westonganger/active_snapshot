@@ -18,3 +18,4 @@ Gemfile.lock
 test/dummy_app/**/*.sqlite*
 test/dummy_app/db/schema.rb
 test/dummy_app/**/*.log
+test/dummy_app/log/test.log

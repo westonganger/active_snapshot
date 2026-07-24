@@ -56,16 +56,6 @@ ActiveRecord::Migration.maintain_test_schema!
 
 require "rspec/mocks/minitest_integration"
 
-post = if defined?(PG)
-  Post.create!(
-    a: 1,
-    b: 3,
-    text_array: ["foo", "bar"],
-    integer_array: [1, 2],
-    enum_array: ["foo", "bar"]
-  )
-end
-
 def assert_time_match(a, b)
   format = "%d-%m-%Y %h:%M:%S.%L" ### MUST LIMIT THE MILLISECONDS TO 3 decimal places of accuracy, the rest are dropped
   assert_equal a.strftime(format), b.strftime(format)
