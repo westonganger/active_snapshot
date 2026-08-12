@@ -18,7 +18,15 @@ module ActiveSnapshot
     return value if value.nil?
 
     begin
-      klass.attribute_types[key].deserialize(value)
+      if klass.respond_to?(:defined_enums) && klass.defined_enums.key?(key)
+        # Snapshots created with gem versions <= 0.4.x stored enum attributes as their
+        # label (e.g. "published"), newer versions store the database value. `deserialize`
+        # expects the database value and would silently turn a label into the enum's
+        # first value (e.g. "published".to_i => 0 => "draft"), `cast` accepts both.
+        klass.attribute_types[key].cast(value)
+      else
+        klass.attribute_types[key].deserialize(value)
+      end
     rescue ActiveRecord::Encryption::Errors::Base
       # handle columns which are changed from non-encrypted to encrypted
       value

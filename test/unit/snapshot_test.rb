@@ -142,6 +142,39 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_nil stored_value
   end
 
+  def test_fetch_reified_items_reifies_enum_stored_as_database_value
+    assert Post.defined_enums.has_key?("status")
+
+    post = Post.create!(a: 1, b: 3)
+
+    post.status = "published"
+
+    snapshot = post.create_snapshot!(identifier: "enum-test")
+
+    reified_post = snapshot.fetch_reified_items[0]
+
+    assert_equal "published", reified_post.status
+  end
+
+  def test_fetch_reified_items_reifies_enum_stored_as_label
+    ### Snapshots created with gem versions <= 0.4.x stored enum attributes as their label
+    assert Post.defined_enums.has_key?("status")
+
+    post = Post.create!(a: 1, b: 3)
+
+    post.status = "published"
+
+    snapshot = post.create_snapshot!(identifier: "enum-test")
+
+    snapshot_item = snapshot.snapshot_items.find_by(item_type: "Post")
+    snapshot_item.object = snapshot_item.object.merge("status" => "published")
+    snapshot_item.save!
+
+    reified_post = snapshot.reload.fetch_reified_items[0]
+
+    assert_equal "published", reified_post.status
+  end
+
   def test_restore
     post = Post.create!(a: 1, b: 3)
     snapshot = post.create_snapshot!(identifier: "v1")
