@@ -3,7 +3,7 @@ CHANGELOG
 
 - **Unreleased**
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.2.1...master)
-  * Nothing yet
+  * [#86](https://github.com/westonganger/active_snapshot/pull/86) - Fix reification of enum attributes stored as labels by snapshots from gem versions <= 0.4.x
 
 - **v1.2.1** - July 24, 2026
   * [View Diff](https://github.com/westonganger/active_snapshot/compare/v1.2.0...v1.2.1)
